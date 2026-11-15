@@ -78,8 +78,8 @@ export interface ISupernovaAPI {
   setTitleBarOverlayColors: (colors: OverlayColors) => void
   setNativeTheme: (isDark: boolean) => void
   downloadFile: (payload: IDownloadPayload) => void
-  downloadCompletedListener: (func: (fileId: string) => void) => void
-  downloadFailedListener: (func: (fileId: string) => void) => void
+  downloadCompletedListener: (func: (fileId: string) => void) => () => void
+  downloadFailedListener: (func: (fileId: string) => void) => () => void
   updatePlayerState: (payload: PlayerStatePayload) => void
   playerStateListener: (
     func: (action: PlayerStateListenerActions) => void,
@@ -90,9 +90,11 @@ export interface ISupernovaAPI {
   checkForUpdates: () => Promise<UpdateCheckResult | null>
   downloadUpdate: () => void
   quitAndInstall: () => void
-  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void
-  onUpdateNotAvailable: (callback: () => void) => void
-  onUpdateError: (callback: (error: string) => void) => void
-  onDownloadProgress: (callback: (progress: ProgressInfo) => void) => void
-  onUpdateDownloaded: (callback: (info: UpdateDownloadedEvent) => void) => void
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void
+  onUpdateNotAvailable: (callback: () => void) => () => void
+  onUpdateError: (callback: (error: string) => void) => () => void
+  onDownloadProgress: (callback: (progress: ProgressInfo) => void) => () => void
+  onUpdateDownloaded: (
+    callback: (info: UpdateDownloadedEvent) => void,
+  ) => () => void
 }

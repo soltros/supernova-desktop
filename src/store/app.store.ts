@@ -1,3 +1,5 @@
+import { invalidateFavorites } from '@/api/favorites'
+import { queryClient } from '@/lib/queryClient'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
@@ -323,6 +325,8 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                   method: 'POST',
                   body: JSON.stringify({ username, password }),
                 })
+                invalidateFavorites()
+                queryClient.clear()
                 set((state) => {
                   state.data.url = base
                   state.data.username = auth.user.username
@@ -337,6 +341,8 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
               }
             },
             removeConfig: () => {
+              invalidateFavorites()
+              queryClient.clear()
               void request('/api/auth/logout', { method: 'POST' }).catch(
                 () => {},
               )

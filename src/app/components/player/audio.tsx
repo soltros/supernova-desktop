@@ -78,7 +78,7 @@ export function AudioPlayer({
     if (replayGainEnabled || !replayGainError) {
       setReplayGainEnabled(false)
       setReplayGainError(true)
-      window.location.reload()
+      setPlayingState(false)
     }
   }, [
     audioRef,
@@ -86,6 +86,7 @@ export function AudioPlayer({
     replayGainError,
     setReplayGainEnabled,
     setReplayGainError,
+    setPlayingState,
     t,
   ])
 
@@ -98,6 +99,7 @@ export function AudioPlayer({
   }, [audioRef, setPlayingState, t])
 
   useEffect(() => {
+    let active = true
     async function handleSong() {
       const audio = audioRef.current
       if (!audio || !props.src) return
@@ -110,11 +112,19 @@ export function AudioPlayer({
           audio.pause()
         }
       } catch (error) {
+        if (
+          !active ||
+          (error instanceof DOMException && error.name === 'AbortError')
+        )
+          return
         logger.error('Audio playback failed', error)
         handleSongError()
       }
     }
-    if (isSong || isPodcast) handleSong()
+    if (isSong || isPodcast) void handleSong()
+    return () => {
+      active = false
+    }
   }, [
     audioRef,
     handleSongError,

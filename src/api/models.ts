@@ -1,3 +1,4 @@
+import { favoriteDate } from './favorites'
 import type { ISong } from '@/types/responses/song'
 import type { Albums } from '@/types/responses/album'
 import type { IArtist } from '@/types/responses/artist'
@@ -40,6 +41,7 @@ export interface NativePlaylist {
 export function songModel(t: NativeTrack, album?: NativeAlbum): ISong {
   return {
     id: t.id,
+    starred: favoriteDate('track', t.id),
     parent: t.album_id,
     isDir: false,
     title: t.title,
@@ -72,6 +74,7 @@ export function songModel(t: NativeTrack, album?: NativeAlbum): ISong {
 export function albumModel(a: NativeAlbum): Albums {
   return {
     id: a.id,
+    starred: favoriteDate('album', a.id),
     name: a.title,
     artist: a.artist_name || '',
     artistId: a.artist_id,
@@ -91,6 +94,7 @@ export function albumModel(a: NativeAlbum): Albums {
 }
 export function artistModel(a: NativeArtist): IArtist {
   return {
+    starred: favoriteDate('artist', a.id),
     id: a.id,
     name: a.name,
     coverArt: a.id,

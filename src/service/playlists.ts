@@ -1,3 +1,4 @@
+import { loadFavorites } from '@/api/favorites'
 import { request } from '@/api/httpClient'
 import {
   NativePlaylist,
@@ -7,24 +8,43 @@ import {
   unsupported,
 } from '@/api/models'
 import type { UpdateParams, CreateParams } from '@/types/responses/playlist'
-async function getAll() {
-  return ((await request<NativePlaylist[] | null>('/api/playlists')) || []).map(
-    playlistModel,
-  )
+async function listMetadata() {
+  return (await request<NativePlaylist[] | null>('/api/playlists')) || []
 }
-async function getOne(id: string) {
-  const p = (await getAll()).find((p) => p.id === id)
-  if (!p) throw new Error('Playlist not found')
-  const tracks =
+async function loadTracks(id: string) {
+  return (
     (await request<NativeTrack[] | null>(
       `/api/playlists/${encodeURIComponent(id)}/tracks`,
     )) || []
+  )
+}
+function playlistStats(p: NativePlaylist, tracks: NativeTrack[]) {
   return {
-    ...p,
-    entry: tracks.map((t) => songModel(t)),
+    ...playlistModel(p),
     songCount: tracks.length,
     duration: tracks.reduce((n, t) => n + t.duration_ms / 1000, 0),
+    coverArt: tracks[0]?.album_id || '',
   }
+}
+async function getAll() {
+  const metadata = await listMetadata()
+  const result: ReturnType<typeof playlistStats>[] = []
+  for (let start = 0; start < metadata.length; start += 4) {
+    const batch = await Promise.all(
+      metadata
+        .slice(start, start + 4)
+        .map(async (p) => playlistStats(p, await loadTracks(p.id))),
+    )
+    result.push(...batch)
+  }
+  return result
+}
+async function getOne(id: string) {
+  await loadFavorites()
+  const p = (await listMetadata()).find((p) => p.id === id)
+  if (!p) throw new Error('Playlist not found')
+  const tracks = await loadTracks(id)
+  return { ...playlistStats(p, tracks), entry: tracks.map((t) => songModel(t)) }
 }
 async function remove(id: string) {
   await request(`/api/playlists/${encodeURIComponent(id)}`, {

@@ -188,7 +188,7 @@ export interface IPlayerActions {
   handleVolumeWheel: (isScrollingDown: boolean) => void
   setCurrentDuration: (duration: number) => void
   setPlayRadio: (list: Radio[], index: number) => void
-  setAudioPlayerRef: (ref: HTMLAudioElement) => void
+  setAudioPlayerRef: (ref: HTMLAudioElement | null) => void
   setNextOnQueue: (songlist: ISong[]) => void
   setLastOnQueue: (songlist: ISong[]) => void
   removeSongFromQueue: (id: string) => void

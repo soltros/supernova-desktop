@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import { produce } from 'immer'
 import clamp from 'lodash/clamp'
 import merge from 'lodash/merge'
@@ -1073,7 +1074,7 @@ usePlayerStore.subscribe(
 usePlayerStore.subscribe((state, prevState) => {
   const currentSong = state.songlist.currentSong ?? null
 
-  if (!currentSong) return
+  if (!currentSong || state.playerState.mediaType !== 'song') return
 
   const progress = state.playerProgress.progress
   const prevProgress = prevState.playerProgress.progress
@@ -1103,10 +1104,12 @@ usePlayerStore.subscribe((state, prevState) => {
   const hasScrobbled =
     usePlayerStore.getState().playerState.hasScrobbledTheCurrentTrack
 
-  if (duration > 0 && accumulatedTime >= targetTime && !hasScrobbled) {
+  if (duration >= 30 && accumulatedTime >= targetTime && !hasScrobbled) {
     usePlayerStore.getState().actions.setHasScrobbledTheCurrentTrack(true)
 
-    scrobble.send(currentSong.id, true)
+    void scrobble
+      .send(currentSong.id, true)
+      .catch((error) => logger.error('Scrobble failed', error))
   }
 })
 

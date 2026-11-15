@@ -1,3 +1,4 @@
+import { loadFavorites } from '@/api/favorites'
 import { pages, request } from '@/api/httpClient'
 import {
   NativeTrack,
@@ -8,11 +9,13 @@ import {
   artistModel,
 } from '@/api/models'
 async function getAllSongs(count = Infinity) {
+  await loadFavorites()
   return (await pages<NativeTrack>('/api/tracks', {}, count)).map((t) =>
     songModel(t),
   )
 }
 async function getSong(id: string) {
+  await loadFavorites()
   const tracks = await pages<NativeTrack>('/api/tracks')
   const t = tracks.find((t) => t.id === id)
   if (!t) throw new Error('Track not found')
@@ -47,6 +50,7 @@ async function getFavoriteSongs() {
   }
 }
 async function getTopSongs(name: string) {
+  await loadFavorites()
   const artists = await pages<NativeArtist>('/api/artists')
   const artist = artists.find((a) => a.name === name)
   return artist
@@ -55,7 +59,12 @@ async function getTopSongs(name: string) {
       ).map((t) => songModel(t))
     : []
 }
-async function getArtistSongs(id:string){return (await pages<NativeTrack>('/api/tracks',{artist_id:id})).map(t=>songModel(t))}
+async function getArtistSongs(id: string) {
+  await loadFavorites()
+  return (await pages<NativeTrack>('/api/tracks', { artist_id: id })).map((t) =>
+    songModel(t),
+  )
+}
 export const songs = {
   getArtistSongs,
   getAllSongs,

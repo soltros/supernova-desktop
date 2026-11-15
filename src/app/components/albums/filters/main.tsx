@@ -28,6 +28,8 @@ export function AlbumsMainFilter() {
   const hiddenFilters = [
     AlbumsFilters.ByDiscography,
     AlbumsFilters.Search,
+    AlbumsFilters.ByGenre,
+    AlbumsFilters.MostPlayed,
     ...(hideFavoritesSection ? [AlbumsFilters.Starred] : []),
   ]
 
@@ -36,9 +38,9 @@ export function AlbumsMainFilter() {
     AlbumsFilters.RecentlyAdded,
   )
 
-  const currentFilterLabel = albumsFilterValues.filter(
-    (item) => item.key === currentFilter,
-  )[0].label
+  const currentFilterLabel =
+    albumsFilterValues.filter((item) => item.key === currentFilter)[0]?.label ||
+    'album.list.filter.name'
 
   function handleChangeFilter(filter: AlbumListType) {
     localStorage.setItem(PersistedAlbumListKeys.MainFilter, filter)

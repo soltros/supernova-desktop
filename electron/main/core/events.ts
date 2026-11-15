@@ -36,11 +36,11 @@ export function setupEvents(window: BrowserWindow | null) {
     updateTray()
   })
 
-  window.webContents.once('did-finish-load', () => {
-    nativeTheme.on('updated', () => {
-      setTaskbarButtons()
-    })
-  })
+  const onNativeThemeUpdated = () => setTaskbarButtons()
+  nativeTheme.on('updated', onNativeThemeUpdated)
+  window.once('closed', () =>
+    nativeTheme.removeListener('updated', onNativeThemeUpdated),
+  )
 
   window.webContents.setWindowOpenHandler((details) => {
     if (/^https?:\/\//i.test(details.url)) void shell.openExternal(details.url)

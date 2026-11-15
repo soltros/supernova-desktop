@@ -1,27 +1,13 @@
-# Resume checkpoint
+# Desktop migration checkpoint
 
-Work paused at the user's request. Nothing has been pushed.
+The native Supernova migration now passes real-server browser and Electron smoke tests. Nothing has been pushed by the agent.
 
-## Completed
+Verified with a disposable Supernova server: login, library browsing, favorites, playlist contents, creation through the UI, ticketed streaming, and actual player pause/resume. Renderer and Electron type checks, both production builds, and 16 contract/lifecycle tests pass.
 
-- Cloned Aonsoku with its history and retained MIT license/attribution.
-- Origin points to soltros/supernova-desktop; upstream points to victoralvesf/aonsoku. Branch: main.
-- Applied Supernova Desktop branding, purple default accents, and Supernova icon assets.
-- Replaced protocol services with native Supernova JSON endpoints, bearer sessions, and scoped media tickets. Removed MD5/salt authentication, protocol negotiation, response envelopes, and credential injection.
-- Added a restricted Electron API bridge and ticketed media protocol with renderer isolation/sandboxing enabled.
-- Migrated library, favorites, playlists, lyrics, radio, and podcast service calls. Disabled unsupported playlist metadata/public operations and removed the most-played home section.
-- Added actual renderer/Electron type checks and nine passing native API contract tests. Electron production build passed.
-- Latest artist-pagination and disabled-control changes passed type checking. Platform ICO/ICNS/favicon assets now derive from the existing Supernova icon.
+The earlier blank smoke screen came from development module requests aborted by host network changes; smoke tests now use the built renderer. Native smoke startup also needed to launch the package root rather than the compiled entry file so Electron resolves the resource directory correctly.
 
-## Outstanding verification
+Native metadata summaries and favorite state are hydrated from the API. Unsupported genre/most-played filters, public playlists, metadata editing, and playlist ZIP downloads are not presented as supported actions. Original audio streams directly when supported; compatibility transcoding is limited to formats the browser cannot decode. Session changes reject stale responses and media tickets. Desktop download/update subscriptions now have cleanup paths.
 
-The real-server browser smoke test currently fails: the initial page is blank, and the login input selector times out. This must be diagnosed before the client is considered usable. The smoke script is in scripts/smoke.mjs and cleans up its disposable Docker server and browser. Native Electron end-to-end testing has not run yet.
+Next verification: finish unpacked package validation, remove obsolete settings for external services/caches, and add repeatable CI/documentation. Native macOS/Windows installers remain platform-specific checks.
 
-Last diagnostic files (temporary, not committed):
-- /tmp/supernova-desktop-smoke-browser.txt
-- /tmp/supernova-desktop-login-debug.png
-- /tmp/supernova-desktop-types.txt
-- /tmp/supernova-desktop-tests.txt
-- /tmp/supernova-desktop-electron-build.txt
-
-Resume by diagnosing startup/module loading in the smoke test, then validate real login, browsing, mutations, streaming, logout, and native Electron. Review unsupported controls, incomplete metadata mappings, remaining inherited settings, and packaging before calling the migration complete. The default test command runs the new native contract suite; inherited Cypress components remain separately available through test:components and need a migration review.
+Diagnostics and screenshots are under /tmp/supernova-desktop-*.

@@ -1,10 +1,9 @@
 import { OptionsButtons } from '@/app/components/options/buttons'
-import { DownloadOptionHandler } from '@/app/components/options/download-handler'
 import { DropdownMenuSeparator } from '@/app/components/ui/dropdown-menu'
 import { useOptions } from '@/app/hooks/use-options'
 import { supernova } from '@/service/supernova'
 import { useIsPlaylistPlaying, usePlayerActions } from '@/store/player.store'
-import { usePlaylists, useRemovePlaylist } from '@/store/playlists.store'
+import { useRemovePlaylist } from '@/store/playlists.store'
 import { PlaybackSource } from '@/types/playerContext'
 import { Playlist, PlaylistWithEntries } from '@/types/responses/playlist'
 import { ISong } from '@/types/responses/song'
@@ -28,27 +27,16 @@ export function PlaylistOptions({
   showPlay = false,
   disablePlayNext = false,
   disableAddLast = false,
-  disableDownload = false,
-  disableEdit = false,
+  disableDownload: _disableDownload = true,
+  disableEdit: _disableEdit = true,
   disableDelete = false,
 }: PlaylistOptionsProps) {
-  const { setPlaylistDialogState, setData } = usePlaylists()
-  const { play, playNext, playLast, startDownload } = useOptions()
+  const { play, playNext, playLast } = useOptions()
   const { setPlaylistId, setConfirmDialogState } = useRemovePlaylist()
   const { isPlaylistActive, isPlaylistPlaying } = useIsPlaylistPlaying(
     playlist.id,
   )
   const { togglePlayPause } = usePlayerActions()
-
-  function handleEdit() {
-    setData({
-      id: playlist.id,
-      name: playlist.name,
-      comment: playlist.comment,
-      public: playlist.public,
-    })
-    setPlaylistDialogState(true)
-  }
 
   async function getSongsToQueue(
     callback: GetSongsToQueueCallback,
@@ -95,10 +83,6 @@ export function PlaylistOptions({
     }
   }
 
-  function handleDownload() {
-    startDownload(playlist.id)
-  }
-
   return (
     <>
       {variant === 'context' && (
@@ -136,25 +120,7 @@ export function PlaylistOptions({
           handlePlayLast()
         }}
       />
-      <DownloadOptionHandler group={false}>
-        <OptionsButtons.Download
-          variant={variant}
-          disabled={true || disableDownload}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleDownload()
-          }}
-        />
-      </DownloadOptionHandler>
       <DropdownMenuSeparator />
-      <OptionsButtons.EditPlaylist
-        variant={variant}
-        onClick={(e) => {
-          e.stopPropagation()
-          handleEdit()
-        }}
-        disabled={true || disableEdit}
-      />
       <OptionsButtons.RemovePlaylist
         variant={variant}
         onClick={(e) => {

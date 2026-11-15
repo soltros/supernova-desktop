@@ -12,6 +12,8 @@ files:
   - 'out/**'
   - '!out/renderer/screenshots{,/**}'
   - 'package.json'
+  - 'LICENSE.txt'
+  - 'FORK.md'
 
 extraResources:
   - from: resources

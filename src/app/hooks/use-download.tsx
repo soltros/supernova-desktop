@@ -35,16 +35,19 @@ export function useDownload() {
   }, [t])
 
   useEffect(() => {
-    const setupListeners = async () => {
-      if (isDesktop()) {
-        window.api.downloadCompletedListener(() => {
-          completed()
-        })
-      }
+    if (!isDesktop()) return
+    const completedListener = window.api.downloadCompletedListener(() =>
+      completed(),
+    )
+    const failedListener = window.api.downloadFailedListener((fileId) => {
+      logger.error('[DownloadDesktop] - Failed to download fileId:', fileId)
+      failed()
+    })
+    return () => {
+      completedListener()
+      failedListener()
     }
-
-    setupListeners()
-  }, [completed])
+  }, [completed, failed])
 
   function downloadBrowser(url: string, id = '') {
     // TODO: Maybe change in the future?
@@ -66,11 +69,6 @@ export function useDownload() {
     window.api.downloadFile({
       url,
       fileId: id,
-    })
-
-    window.api.downloadFailedListener((fileId) => {
-      logger.error('[DownloadDesktop] - Failed to download fileId:', fileId)
-      failed()
     })
   }
 

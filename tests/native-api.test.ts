@@ -1,3 +1,4 @@
+import { invalidateFavorites } from '@/api/favorites'
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
 import { useAppStore } from '@/store/app.store'
 import {
@@ -36,6 +37,7 @@ function reply(data: unknown, status = 200) {
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock)
   fetchMock.mockReset()
+  invalidateFavorites()
   localStorage.clear()
   useAppStore.setState((state) => {
     state.data.url = 'https://music.example'
@@ -55,13 +57,11 @@ it('logs in with native JSON and persists a session token without a password', a
     }),
   )
   expect(
-    await useAppStore
-      .getState()
-      .actions.saveConfig({
-        url: 'https://music.example/',
-        username: 'alice',
-        password: 'secret-password',
-      }),
+    await useAppStore.getState().actions.saveConfig({
+      url: 'https://music.example/',
+      username: 'alice',
+      password: 'secret-password',
+    }),
   ).toBe(true)
   const [url, options] = fetchMock.mock.calls[0]
   expect(String(url)).toBe('https://music.example/api/auth/login')
@@ -99,6 +99,7 @@ it('requests scoped media tickets and never exposes bearer credentials in URLs',
 it('paginates beyond 1000 native tracks and converts milliseconds to seconds', async () => {
   fetchMock.mockImplementation((url: URL) => {
     const path = new URL(url)
+    if (path.pathname === '/api/hearts') return Promise.resolve(reply([]))
     if (path.pathname.includes('/api/albums/'))
       return Promise.resolve(reply(album))
     return Promise.resolve(
@@ -116,7 +117,7 @@ it('paginates beyond 1000 native tracks and converts milliseconds to seconds', a
   expect(result.song).toHaveLength(1001)
   expect(result.song[0].duration).toBe(123)
   expect(result.song[0].album).toBe('Album')
-  expect(fetchMock).toHaveBeenCalledTimes(3)
+  expect(fetchMock).toHaveBeenCalledTimes(4)
 })
 it('uses typed heart mutations and preserves server failures', async () => {
   fetchMock.mockResolvedValue(new Response(null, { status: 200 }))
@@ -202,12 +203,10 @@ it('uses Supernova plugin episodes and progress in milliseconds', async () => {
   })
 })
 it('uses the isolated Electron bridge without browser CORS workarounds', async () => {
-  const bridge = vi
-    .fn()
-    .mockResolvedValue({
-      status: 200,
-      body: JSON.stringify({ ticket: 'desktop-ticket' }),
-    })
+  const bridge = vi.fn().mockResolvedValue({
+    status: 200,
+    body: JSON.stringify({ ticket: 'desktop-ticket' }),
+  })
   ;(window as any).api = { supernovaRequest: bridge }
   const stream = await getSongStreamUrl('track-1')
   expect(stream).toContain('supernova-media://stream/')
@@ -227,4 +226,88 @@ it('rejects active schemes and URL credentials and refuses protocol endpoints', 
     expect(() => normalizeServerUrl(url)).toThrow()
   await expect(request('/rest/ping')).rejects.toThrow('native Supernova')
   expect(fetchMock).not.toHaveBeenCalled()
+})
+it('hydrates actual playlist counts, durations, and cover art', async () => {
+  fetchMock.mockImplementation((url: URL) =>
+    Promise.resolve(
+      reply(
+        new URL(url).pathname === '/api/playlists'
+          ? [{ id: 'p', name: 'Mix', user_id: 'u', created_at: '' }]
+          : [track, track],
+      ),
+    ),
+  )
+  const result = await supernova.playlists.getAll()
+  expect(result[0]).toMatchObject({
+    songCount: 2,
+    duration: 246,
+    coverArt: 'album-1',
+  })
+})
+it('hydrates heart state and refreshes it after a mutation', async () => {
+  fetchMock.mockImplementation((url: URL, options: RequestInit) => {
+    if (options.method === 'DELETE') return Promise.resolve(reply(undefined))
+    return Promise.resolve(
+      reply(
+        new URL(url).pathname === '/api/hearts'
+          ? [
+              {
+                entity_type: 'track',
+                entity_id: track.id,
+                created_at: '2026-11-15',
+              },
+            ]
+          : [track],
+      ),
+    )
+  })
+  const first = await supernova.search.get({
+    artistCount: 0,
+    albumCount: 0,
+    songCount: 1,
+  })
+  expect(first.song[0].starred).toBe('2026-11-15')
+  await supernova.star.unstarItem(track.id)
+  fetchMock.mockImplementation((url: URL) =>
+    Promise.resolve(
+      reply(new URL(url).pathname === '/api/hearts' ? [] : [track]),
+    ),
+  )
+  const second = await supernova.search.get({
+    artistCount: 0,
+    albumCount: 0,
+    songCount: 1,
+  })
+  expect(second.song[0].starred).toBeUndefined()
+})
+it('rejects a late response when another account signs in', async () => {
+  let resolve!: (response: Response) => void
+  fetchMock.mockImplementation(
+    () =>
+      new Promise<Response>((done) => {
+        resolve = done
+      }),
+  )
+  const pending = request('/api/playlists')
+  useAppStore.setState((state) => {
+    state.data.token = 'other-account'
+  })
+  resolve(reply([]))
+  await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+})
+it('never sends an old account media ticket to a newly selected server', async () => {
+  let resolve!: (response: Response) => void
+  fetchMock.mockImplementation(
+    () =>
+      new Promise<Response>((done) => {
+        resolve = done
+      }),
+  )
+  const pending = getSongStreamUrl('track-1')
+  useAppStore.setState((state) => {
+    state.data.url = 'https://another.example'
+    state.data.token = 'other-account'
+  })
+  resolve(reply({ ticket: 'old-ticket' }))
+  await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
 })

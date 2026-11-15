@@ -63,9 +63,13 @@ export async function requestAt<T>(
   const text = await response.text()
   return text ? (JSON.parse(text) as T) : (undefined as T)
 }
-export function request<T>(path: string, options: FetchOptions = {}) {
+export async function request<T>(path: string, options: FetchOptions = {}) {
   const { url, token } = useAppStore.getState().data
-  return requestAt<T>(url, path, options, token)
+  const result = await requestAt<T>(url, path, options, token)
+  const current = useAppStore.getState().data
+  if (current.url !== url || current.token !== token)
+    throw new DOMException('Session changed during request', 'AbortError')
+  return result
 }
 export async function pages<T>(
   path: string,
@@ -73,8 +77,14 @@ export async function pages<T>(
   count = Number.POSITIVE_INFINITY,
   offset = 0,
 ): Promise<T[]> {
+  const session = useAppStore.getState().data
+  const sessionUrl = session.url,
+    sessionToken = session.token
   const result: T[] = []
   while (result.length < count) {
+    const current = useAppStore.getState().data
+    if (current.url !== sessionUrl || current.token !== sessionToken)
+      throw new DOMException('Session changed during pagination', 'AbortError')
     const limit = Math.min(1000, count - result.length)
     const batch =
       (await request<T[] | null>(path, {
@@ -91,7 +101,10 @@ export function getSimpleCoverArtUrl(
   _size = '300',
 ): string {
   if (!id || type === 'artist')
-    return `/default_${type === 'artist' ? 'artist' : 'album'}_art.png`
+    return new URL(
+      `default_${type === 'artist' ? 'artist' : 'album'}_art.png`,
+      document.baseURI,
+    ).toString()
   return `${useAppStore.getState().data.url}/api/art/album/${encodeURIComponent(id)}`
 }
 export async function getCoverArtUrl(
@@ -113,19 +126,26 @@ async function mediaUrl(
   scope: 'stream' | 'download-track' | 'download-album',
   format?: string,
 ) {
-  const { ticket } = await request<{ ticket: string }>('/api/media-ticket', {
-    method: 'POST',
-    body: JSON.stringify({ scope, resource: id }),
-  })
+  const { url: base, token } = useAppStore.getState().data
+  const { ticket } = await requestAt<{ ticket: string }>(
+    base,
+    '/api/media-ticket',
+    {
+      method: 'POST',
+      body: JSON.stringify({ scope, resource: id }),
+    },
+    token,
+  )
+  const current = useAppStore.getState().data
+  if (current.url !== base || current.token !== token)
+    throw new DOMException('Session changed during media request', 'AbortError')
   const route =
     scope === 'stream'
       ? 'stream'
       : scope === 'download-album'
         ? 'download/album'
         : 'download/track'
-  const url = new URL(
-    `${useAppStore.getState().data.url}/api/${route}/${encodeURIComponent(id)}`,
-  )
+  const url = new URL(`${base}/api/${route}/${encodeURIComponent(id)}`)
   url.searchParams.set('ticket', ticket)
   if (format && format !== 'raw') url.searchParams.set('format', format)
   return url.toString()

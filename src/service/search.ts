@@ -1,3 +1,4 @@
+import { loadFavorites } from '@/api/favorites'
 import { pages, request } from '@/api/httpClient'
 import {
   NativeTrack,
@@ -25,6 +26,7 @@ async function get({
   songCount = 20,
   songOffset = 0,
 }: SearchQueryOptions) {
+  await loadFavorites()
   if (query) {
     const d = await request<{
       tracks: NativeTrack[]

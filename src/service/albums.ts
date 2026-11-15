@@ -1,3 +1,4 @@
+import { loadFavorites } from '@/api/favorites'
 import type { IAlbumInfo } from '@/types/responses/album'
 import { pages, request } from '@/api/httpClient'
 import {
@@ -20,7 +21,10 @@ async function getAlbumList({
   type = 'alphabeticalByName',
   size = 30,
   offset = 0,
+  fromYear,
+  toYear,
 }: Partial<AlbumListParams> = {}) {
+  await loadFavorites()
   if (type === 'byGenre') return unsupported('Genre filtering')
   let list: NativeAlbum[]
   if (type === 'newest') {
@@ -57,7 +61,20 @@ async function getAlbumList({
       list.sort((a, b) =>
         (a.artist_name || '').localeCompare(b.artist_name || ''),
       )
-    if (type === 'byYear') list.sort((a, b) => b.release_year - a.release_year)
+    if (type === 'byYear') {
+      const from = Number(fromYear) || 0,
+        to = Number(toYear) || 9999
+      list = list.filter(
+        (a) =>
+          a.release_year >= Math.min(from, to) &&
+          a.release_year <= Math.max(from, to),
+      )
+      list.sort((a, b) =>
+        from <= to
+          ? a.release_year - b.release_year
+          : b.release_year - a.release_year,
+      )
+    }
     if (type === 'alphabeticalByName')
       return {
         list: list.map(albumModel),
@@ -70,6 +87,7 @@ async function getAlbumList({
   }
 }
 async function getOne(id: string) {
+  await loadFavorites()
   const a = await request<NativeAlbum>(`/api/albums/${encodeURIComponent(id)}`)
   const tracks = await pages<NativeTrack>('/api/tracks', { album_id: id })
   return {

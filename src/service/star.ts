@@ -1,15 +1,18 @@
+import { invalidateFavorites } from '@/api/favorites'
 import { request } from '@/api/httpClient'
 async function starItem(id: string, entityType = 'track') {
   await request('/api/hearts', {
     method: 'POST',
     body: JSON.stringify({ entity_type: entityType, entity_id: id }),
   })
+  invalidateFavorites()
 }
 async function unstarItem(id: string, entityType = 'track') {
   await request('/api/hearts', {
     method: 'DELETE',
     query: { entity_type: entityType, entity_id: id },
   })
+  invalidateFavorites()
 }
 async function handleStarItem({
   id,

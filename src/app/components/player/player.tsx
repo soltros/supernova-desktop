@@ -12,7 +12,6 @@ import {
   usePlayerIsPlaying,
   usePlayerLoop,
   usePlayerMediaType,
-  usePlayerRef,
   usePlayerSonglist,
   usePlayerStore,
   useReplayGainState,
@@ -67,7 +66,6 @@ export function Player() {
   const isPlaying = usePlayerIsPlaying()
   const { isSong, isRadio, isPodcast } = usePlayerMediaType()
   const loopState = usePlayerLoop()
-  const audioPlayerRef = usePlayerRef()
   const currentPlaybackRate = usePlayerStore().playerState.currentPlaybackRate
   const { replayGainType, replayGainPreAmp, replayGainDefaultGain } =
     useReplayGainState()
@@ -106,13 +104,26 @@ export function Player() {
     return audioRef
   }, [isPodcast, isRadio])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: audioRef needed
   useEffect(() => {
-    if (!isSong && !song) return
-
-    if (audioPlayerRef === null && audioRef.current)
-      setAudioPlayerRef(audioRef.current)
-  }, [audioPlayerRef, audioRef, isSong, setAudioPlayerRef, song])
+    const node = getAudioRef().current
+    setAudioPlayerRef(node)
+    return () => {
+      if (usePlayerStore.getState().playerState.audioPlayerRef === node)
+        setAudioPlayerRef(null)
+      if (node) {
+        node.pause()
+        node.removeAttribute('src')
+        node.load()
+      }
+    }
+  }, [
+    getAudioRef,
+    songStreamUrl,
+    songId,
+    radio?.id,
+    podcast?.id,
+    setAudioPlayerRef,
+  ])
 
   useEffect(() => {
     const audio = podcastRef.current

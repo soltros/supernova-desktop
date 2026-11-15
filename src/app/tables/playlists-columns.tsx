@@ -1,4 +1,4 @@
-import { ClockIcon, Eye, EyeOff } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { PlaylistOptions } from '@/app/components/playlist/options'
@@ -119,24 +119,6 @@ export function playlistsColumns(): ColumnDefType<Playlist>[] {
 
         return formattedDuration
       },
-    },
-    {
-      id: 'public',
-      accessorKey: 'public',
-      style: {
-        width: 100,
-        maxWidth: 100,
-      },
-      header: i18n.t('table.columns.public'),
-      cell: ({ row }) => (
-        <div>
-          {row.original.public ? (
-            <Eye className="w-5 h-5 text-foreground" />
-          ) : (
-            <EyeOff className="w-5 h-5 text-muted-foreground opacity-70" />
-          )}
-        </div>
-      ),
     },
     {
       id: 'actions',

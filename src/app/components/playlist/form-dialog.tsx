@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-
 import { toast } from 'react-toastify'
 import { z } from 'zod'
 import { Button } from '@/app/components/ui/button'
@@ -17,202 +16,71 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/app/components/ui/form'
 import { Input } from '@/app/components/ui/input'
-import { Switch } from '@/app/components/ui/switch'
-import { Textarea } from '@/app/components/ui/textarea'
 import { supernova } from '@/service/supernova'
 import { usePlaylists } from '@/store/playlists.store'
-import { PlaylistData } from '@/types/playlistsContext'
 import { queryKeys } from '@/utils/queryKeys'
-
-const playlistSchema = z.object({
-  name: z.string().min(2, { message: 'playlist.form.validations.nameLength' }),
-  comment: z.string(),
-  isPublic: z.boolean(),
+const schema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: 'playlist.form.validations.nameLength' }),
 })
-
-type PlaylistSchema = z.infer<typeof playlistSchema>
-
-const defaultValues: PlaylistSchema = {
-  name: '',
-  comment: '',
-  isPublic: false,
-}
-
+type Values = z.infer<typeof schema>
 export function CreatePlaylistDialog() {
   const { t } = useTranslation()
-  const { data, setData, playlistDialogState, setPlaylistDialogState } =
-    usePlaylists()
-
-  const isCreation = Object.keys(data).length === 0
-
-  const form = useForm<PlaylistSchema>({
-    resolver: zodResolver(playlistSchema),
-    defaultValues,
-  })
-
-  useEffect(() => {
-    if (isCreation) {
-      form.reset(defaultValues)
-    } else {
-      form.reset({
-        name: data.name ?? '',
-        comment: data.comment ?? '',
-        isPublic: data.public,
-      })
-    }
-  }, [data, form, isCreation])
-
+  const { playlistDialogState, setPlaylistDialogState } = usePlaylists()
   const queryClient = useQueryClient()
-
-  const createMutation = useMutation({
-    mutationFn: supernova.playlists.createWithDetails,
+  const form = useForm<Values>({
+    resolver: zodResolver(schema),
+    defaultValues: { name: '' },
+  })
+  useEffect(() => {
+    if (playlistDialogState) form.reset({ name: '' })
+  }, [playlistDialogState, form])
+  const mutation = useMutation({
+    mutationFn: ({ name }: Values) => supernova.playlists.create(name),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKeys.playlist.all],
-      })
+      void queryClient.invalidateQueries({ queryKey: [queryKeys.playlist.all] })
       toast.success(t('playlist.form.create.toast.success'))
+      setPlaylistDialogState(false)
     },
-    onError: () => {
-      toast.error(t('playlist.form.create.toast.success'))
-    },
+    onError: (error) =>
+      toast.error(error.message || t('playlist.form.edit.toast.error')),
   })
-
-  const updateMutation = useMutation({
-    mutationFn: supernova.playlists.update,
-    onSuccess: () => {
-      Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [queryKeys.playlist.all],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [queryKeys.playlist.single, data.id],
-        }),
-      ])
-      toast.success(t('playlist.form.edit.toast.success'))
-    },
-    onError: () => {
-      toast.error(t('playlist.form.edit.toast.error'))
-    },
-  })
-
-  async function onSubmit({ name, comment, isPublic }: PlaylistSchema) {
-    if (isCreation) {
-      await createMutation.mutateAsync({
-        name,
-        comment,
-        isPublic: isPublic ? 'true' : 'false',
-      })
-    } else {
-      await updateMutation.mutateAsync({
-        playlistId: data.id,
-        name,
-        comment,
-        isPublic: isPublic ? 'true' : 'false',
-      })
-    }
-
-    setPlaylistDialogState(false)
-    clear()
-  }
-
-  function clear() {
-    setData({} as PlaylistData)
-  }
-
   return (
-    <Dialog
-      defaultOpen={false}
-      open={playlistDialogState}
-      onOpenChange={(state) => {
-        if (!state) clear()
-        setPlaylistDialogState(state)
-      }}
-    >
+    <Dialog open={playlistDialogState} onOpenChange={setPlaylistDialogState}>
       <DialogContent className="max-w-[500px]" aria-describedby={undefined}>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+          >
             <DialogHeader>
-              <DialogTitle>
-                {t(`playlist.form.${isCreation ? 'create' : 'edit'}.title`)}
-              </DialogTitle>
+              <DialogTitle>{t('playlist.form.create.title')}</DialogTitle>
             </DialogHeader>
-
-            <div className="my-4 space-y-4">
+            <div className="my-4">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="required">
-                      {t('playlist.form.labels.name')}
-                    </FormLabel>
+                    <FormLabel>{t('playlist.form.labels.name')}</FormLabel>
                     <FormControl>
-                      <Input {...field} id="playlist-name" />
+                      <Input {...field} id="playlist-name" autoFocus />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="comment"
-                disabled
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('playlist.form.labels.comment')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        disabled
-                        placeholder={t(
-                          'playlist.form.labels.commentDescription',
-                        )}
-                        className="resize-none"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="isPublic"
-                disabled
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-accent/40">
-                    <div>
-                      <FormLabel>
-                        {t('playlist.form.labels.isPublic')}
-                      </FormLabel>
-                      <FormDescription className="my-1">
-                        {t('playlist.form.labels.isPublicDescription')}
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        id="playlist-is-public"
-                        disabled
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="ml-4"
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />
             </div>
             <DialogFooter>
-              <Button type="submit">
-                {t(`playlist.form.${isCreation ? 'create' : 'edit'}.button`)}
+              <Button type="submit" disabled={mutation.isPending}>
+                {t('playlist.form.create.button')}
               </Button>
             </DialogFooter>
           </form>

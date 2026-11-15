@@ -1,5 +1,7 @@
+// Preserve original audio whenever the browser can decode it.
 export function ensureSupportForAlac(suffix: string | undefined) {
-  if (suffix === 'm4a') return 'opus'
-
-  return suffix
+  return suffix &&
+    ['m4a', 'm4b', 'alac', 'aiff', 'aif', 'wma'].includes(suffix.toLowerCase())
+    ? 'opus'
+    : undefined
 }

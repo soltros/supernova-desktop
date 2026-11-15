@@ -2,6 +2,12 @@ import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 import { ISupernovaAPI, IpcChannels, PlayerStateListenerActions } from './types'
 
+function subscribe<T>(channel: IpcChannels, callback: (value: T) => void) {
+  const listener = (_event: unknown, value: T) => callback(value)
+  ipcRenderer.on(channel, listener)
+  return () => ipcRenderer.removeListener(channel, listener)
+}
+
 // Custom APIs for renderer
 const api: ISupernovaAPI = {
   supernovaRequest: (payload) =>
@@ -36,16 +42,10 @@ const api: ISupernovaAPI = {
     ipcRenderer.send(IpcChannels.UpdateNativeTheme, isDark),
   downloadFile: (payload) =>
     ipcRenderer.send(IpcChannels.HandleDownloads, payload),
-  downloadCompletedListener: (func) => {
-    ipcRenderer.once(IpcChannels.DownloadCompleted, (_, fileId: string) =>
-      func(fileId),
-    )
-  },
-  downloadFailedListener: (func) => {
-    ipcRenderer.once(IpcChannels.DownloadFailed, (_, fileId: string) =>
-      func(fileId),
-    )
-  },
+  downloadCompletedListener: (callback) =>
+    subscribe(IpcChannels.DownloadCompleted, callback),
+  downloadFailedListener: (callback) =>
+    subscribe(IpcChannels.DownloadFailed, callback),
   updatePlayerState: (payload) => {
     ipcRenderer.send(IpcChannels.UpdatePlayerState, payload)
   },
@@ -67,23 +67,15 @@ const api: ISupernovaAPI = {
   checkForUpdates: () => ipcRenderer.invoke(IpcChannels.CheckForUpdates),
   downloadUpdate: () => ipcRenderer.send(IpcChannels.DownloadUpdate),
   quitAndInstall: () => ipcRenderer.send(IpcChannels.QuitAndInstall),
-  onUpdateAvailable: (callback) => {
-    ipcRenderer.on(IpcChannels.UpdateAvailable, (_, info) => callback(info))
-  },
-  onUpdateNotAvailable: (callback) => {
-    ipcRenderer.on(IpcChannels.UpdateNotAvailable, () => callback())
-  },
-  onUpdateError: (callback) => {
-    ipcRenderer.on(IpcChannels.UpdateError, (_, error) => callback(error))
-  },
-  onDownloadProgress: (callback) => {
-    ipcRenderer.on(IpcChannels.DownloadProgress, (_, progress) =>
-      callback(progress),
-    )
-  },
-  onUpdateDownloaded: (callback) => {
-    ipcRenderer.on(IpcChannels.UpdateDownloaded, (_, info) => callback(info))
-  },
+  onUpdateAvailable: (callback) =>
+    subscribe(IpcChannels.UpdateAvailable, callback),
+  onUpdateNotAvailable: (callback) =>
+    subscribe(IpcChannels.UpdateNotAvailable, callback),
+  onUpdateError: (callback) => subscribe(IpcChannels.UpdateError, callback),
+  onDownloadProgress: (callback) =>
+    subscribe(IpcChannels.DownloadProgress, callback),
+  onUpdateDownloaded: (callback) =>
+    subscribe(IpcChannels.UpdateDownloaded, callback),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
