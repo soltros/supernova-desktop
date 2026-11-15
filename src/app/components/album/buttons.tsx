@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Actions } from '@/app/components/actions'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppPages, useAppStore } from '@/store/app.store'
 import {
   useIsAlbumPlaying,
@@ -32,7 +32,7 @@ export function AlbumButtons({ album, showInfoButton }: AlbumButtonsProps) {
   const queryClient = useQueryClient()
 
   const starMutation = useMutation({
-    mutationFn: subsonic.star.handleStarItem,
+    mutationFn: supernova.star.handleStarItem,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.album.single, album.id],

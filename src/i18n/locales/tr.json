@@ -369,7 +369,7 @@
   "login": {
     "form": {
       "server": "Sunucu",
-      "description": "Subsonic sunucunuza bağlanın.",
+      "description": "Supernova sunucunuza bağlanın.",
       "url": "URL",
       "urlDescription": "Bu sizin sunucu URL'nizdir",
       "username": "Kullanıcı Adı",
@@ -524,7 +524,7 @@
     "management": "Sunucu yönetimi",
     "incompatible": {
       "title": "Uyumsuz sunucu",
-      "description": "Bu sunucu, tam olarak desteklenmeyen eski bir Subsonic protokol sürümünü kullanıyor. Sorun yaşayabileceğiniz için lütfen dikkatli devam edin.",
+      "description": "Bu sunucu, tam olarak desteklenmeyen eski bir Supernova protokol sürümünü kullanıyor. Sorun yaşayabileceğiniz için lütfen dikkatli devam edin.",
       "skip": "Yine de devam et"
     },
     "buttons": {

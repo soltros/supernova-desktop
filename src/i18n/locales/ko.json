@@ -191,7 +191,7 @@
       "urlDescription": "서버 URL입니다",
       "url": "URL",
       "connect": "연결",
-      "description": "Subsonic 서버에 접속하세요."
+      "description": "Supernova 서버에 접속하세요."
     }
   },
   "player": {
@@ -663,7 +663,7 @@
     "incompatible": {
       "title": "호환되지 않는 서버",
       "skip": "그래도 계속",
-      "description": "이 서버는 이전 Subsonic 프로토콜을 사용하고 있어 완벽히 지원되지 않습니다. 발생 가능한 오류에 주의하세요."
+      "description": "이 서버는 이전 Supernova 프로토콜을 사용하고 있어 완벽히 지원되지 않습니다. 발생 가능한 오류에 주의하세요."
     },
     "buttons": {
       "refresh": "새로고침 상태",

@@ -1,5 +1,4 @@
 import { Albums } from './album'
-import { SubsonicResponse } from './subsonicResponse'
 
 export interface IFeaturedArtist {
   id: string
@@ -28,8 +27,6 @@ export interface ISimilarArtist {
   starred?: string
 }
 
-export interface ArtistResponse extends SubsonicResponse<{ artist: IArtist }> {}
-
 export interface IArtistInfo {
   biography?: string
   musicBrainzId?: string
@@ -39,9 +36,6 @@ export interface IArtistInfo {
   largeImageUrl?: string
   similarArtist?: ISimilarArtist[]
 }
-
-export interface ArtistInfoResponse
-  extends SubsonicResponse<{ artistInfo: IArtistInfo }> {}
 
 export interface ArtistSeparator {
   name: string
@@ -53,6 +47,3 @@ export interface Artists {
   lastModified: number
   ignoredArticles: string
 }
-
-export interface ArtistsResponse
-  extends SubsonicResponse<{ artists: Artists }> {}

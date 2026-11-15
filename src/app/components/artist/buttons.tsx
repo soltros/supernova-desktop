@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Actions } from '@/app/components/actions'
 import { useSongList } from '@/app/hooks/use-song-list'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppPages, useAppStore } from '@/store/app.store'
 import {
   useIsArtistPlaying,
@@ -38,7 +38,7 @@ export function ArtistButtons({
   const queryClient = useQueryClient()
 
   const starMutation = useMutation({
-    mutationFn: subsonic.star.handleStarItem,
+    mutationFn: supernova.star.handleStarItem,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.artist.single, artist.id],

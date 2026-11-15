@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/app/components/ui/alert-dialog'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useRadios } from '@/store/radios.store'
 import { Radio } from '@/types/responses/radios'
 import { queryKeys } from '@/utils/queryKeys'
@@ -25,7 +25,7 @@ export function RemoveRadioDialog() {
   const queryClient = useQueryClient()
 
   const removeMutation = useMutation({
-    mutationFn: subsonic.radios.remove,
+    mutationFn: supernova.radios.remove,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.radio.all],

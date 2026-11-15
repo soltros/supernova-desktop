@@ -1,3 +1,4 @@
+import { installMediaProtocol } from './core/supernova'
 import { electronApp, optimizer, platform } from '@electron-toolkit/utils'
 import { app } from 'electron'
 import { createAppMenu } from './core/menu'
@@ -34,6 +35,7 @@ if (!instanceLock) {
   app.whenReady().then(() => {
     electronApp.setAppUserModelId('com.soltros.supernova.desktop')
 
+    installMediaProtocol()
     initAutoUpdater()
     createWindow()
   })

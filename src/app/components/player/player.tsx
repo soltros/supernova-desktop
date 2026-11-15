@@ -1,11 +1,11 @@
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getSongStreamUrl } from '@/api/httpClient'
 import { getProxyURL } from '@/api/podcastClient'
 import { MiniPlayerButton } from '@/app/components/mini-player/button'
 import { RadioInfo } from '@/app/components/player/radio-info'
 import { TrackInfo } from '@/app/components/player/track-info'
 import { podcasts } from '@/service/podcasts'
-import { useAppMediaCache, useAppStore } from '@/store/app.store'
+import { useAppStore } from '@/store/app.store'
 import {
   getVolume,
   usePlayerActions,
@@ -76,21 +76,28 @@ export function Player() {
   const radio = radioList[currentSongIndex]
   const podcast = podcastList[currentSongIndex]
 
-  const mediaCacheEnabled = useAppMediaCache()
   const songId = song?.id
 
-  const songStreamUrl = useMemo(() => {
-    if (!songId) return ''
-
-    const cacheBustToken = mediaCacheEnabled ? undefined : Date.now().toString()
-
-    return getSongStreamUrl(
-      songId,
-      undefined,
-      ensureSupportForAlac(song.suffix),
-      cacheBustToken,
-    )
-  }, [songId, song, mediaCacheEnabled])
+  const [songStreamUrl, setSongStreamUrl] = useState('')
+  useEffect(() => {
+    let active = true
+    setSongStreamUrl('')
+    if (songId)
+      void getSongStreamUrl(
+        songId,
+        undefined,
+        ensureSupportForAlac(song.suffix),
+      )
+        .then((url) => {
+          if (active) setSongStreamUrl(url)
+        })
+        .catch(() => {
+          if (active) setPlayingState(false)
+        })
+    return () => {
+      active = false
+    }
+  }, [songId, song?.suffix, setPlayingState])
 
   const getAudioRef = useCallback(() => {
     if (isRadio) return radioRef
@@ -262,7 +269,7 @@ export function Player() {
         </div>
       </div>
 
-      {isSong && song && (
+      {isSong && song && songStreamUrl && (
         <AudioPlayer
           replayGain={trackReplayGain}
           src={songStreamUrl}

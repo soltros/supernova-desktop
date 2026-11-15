@@ -1,39 +1,14 @@
-import { httpClient } from '@/api/httpClient'
-import { GenresResponse } from '@/types/responses/genre'
-import { SongsByGenreResponse } from '@/types/responses/song'
-
-async function get() {
-  const response = await httpClient<GenresResponse>('/getGenres', {
-    method: 'GET',
-  })
-
-  return response?.data.genres.genre
+import { unsupported } from '@/api/models'
+import type { Genre } from '@/types/responses/genre'
+import type { ISong } from '@/types/responses/song'
+async function get(): Promise<Genre[]> {
+  return unsupported('Genres')
 }
-
-interface GetSongsByGenreParams {
+async function getSongsByGenre(_params: {
   genre: string
   count?: number
   offset?: number
+}): Promise<ISong[]> {
+  return unsupported('Genre filtering')
 }
-
-async function getSongsByGenre({
-  genre,
-  count = 500,
-  offset = 0,
-}: GetSongsByGenreParams) {
-  const response = await httpClient<SongsByGenreResponse>('/getSongsByGenre', {
-    method: 'GET',
-    query: {
-      genre,
-      count: count.toString(),
-      offset: offset.toString(),
-    },
-  })
-
-  return response?.data.songsByGenre.song
-}
-
-export const genres = {
-  get,
-  getSongsByGenre,
-}
+export const genres = { get, getSongsByGenre }

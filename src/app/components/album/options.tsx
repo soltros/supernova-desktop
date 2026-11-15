@@ -32,7 +32,7 @@ export function AlbumOptions({ album }: AlbumOptionsProps) {
   }
 
   function handleDownload() {
-    startDownload(album.id)
+    startDownload(album.id, 'album')
   }
 
   function handleAddToPlaylist(id: string) {

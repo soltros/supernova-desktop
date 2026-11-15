@@ -1,51 +1,39 @@
-import { httpClient } from '@/api/httpClient'
+import type { IArtistInfo } from '@/types/responses/artist'
+import { pages, request } from '@/api/httpClient'
 import {
-  ArtistInfoResponse,
-  ArtistResponse,
-  ArtistsResponse,
-  ISimilarArtist,
-} from '@/types/responses/artist'
-
+  NativeArtist,
+  NativeAlbum,
+  artistModel,
+  albumModel,
+} from '@/api/models'
 async function getAll() {
-  const response = await httpClient<ArtistsResponse>('/getArtists', {
-    method: 'GET',
-  })
-
-  if (!response) return []
-
-  const artistsList: ISimilarArtist[] = []
-
-  response.data.artists.index.forEach((item) => {
-    artistsList.push(...item.artist)
-  })
-
-  return artistsList.sort((a, b) => a.name.localeCompare(b.name))
+  return (await pages<NativeArtist>('/api/artists')).map((a) => ({
+    ...artistModel(a),
+    albumCount: 0,
+  }))
 }
-
 async function getOne(id: string) {
-  const response = await httpClient<ArtistResponse>('/getArtist', {
-    method: 'GET',
-    query: {
-      id,
-    },
-  })
-
-  return response?.data.artist
+  const a = await request<NativeArtist>(
+    `/api/artists/${encodeURIComponent(id)}`,
+  )
+  const list = await pages<NativeAlbum>('/api/albums', { artist_id: id })
+  return {
+    ...artistModel(a),
+    album: list.map(albumModel),
+    albumCount: list.length,
+  }
 }
-
-async function getInfo(id: string) {
-  const response = await httpClient<ArtistInfoResponse>('/getArtistInfo', {
-    method: 'GET',
-    query: {
-      id,
-    },
-  })
-
-  return response?.data.artistInfo
+async function getInfo(id: string): Promise<IArtistInfo> {
+  const a = await request<NativeArtist>(
+    `/api/artists/${encodeURIComponent(id)}`,
+  )
+  return {
+    biography: a.bio,
+    musicBrainzId: a.musicbrainz_id,
+    smallImageUrl: a.image_url,
+    mediumImageUrl: a.image_url,
+    largeImageUrl: a.image_url,
+    similarArtist: [],
+  }
 }
-
-export const artists = {
-  getOne,
-  getInfo,
-  getAll,
-}
+export const artists = { getAll, getOne, getInfo }

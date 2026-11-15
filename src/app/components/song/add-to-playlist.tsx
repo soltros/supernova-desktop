@@ -14,7 +14,7 @@ import {
 import { ContextMenuItem } from '@/app/components/ui/context-menu'
 import { DropdownMenuItem } from '@/app/components/ui/dropdown-menu'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { queryKeys } from '@/utils/queryKeys'
 
 interface AddToPlaylistSubMenuProps {
@@ -32,7 +32,7 @@ export function AddToPlaylistSubMenu({
 
   const { data: playlists } = useQuery({
     queryKey: [queryKeys.playlist.all],
-    queryFn: subsonic.playlists.getAll,
+    queryFn: supernova.playlists.getAll,
   })
 
   function avoidTypeAhead(e: KeyboardEvent<HTMLInputElement>) {

@@ -381,7 +381,7 @@
   "login": {
     "form": {
       "server": "Server",
-      "description": "Mit dim Subsonic Server verbinde.",
+      "description": "Mit dim Supernova Server verbinde.",
       "url": "URL",
       "urlDescription": "Das isch dini Server URL",
       "username": "Benutzername",
@@ -536,7 +536,7 @@
     "management": "Server Verwaltig",
     "incompatible": {
       "title": "Server Inkompatibel",
-      "description": "Dä Server benutzt e älteri Version vom Subsonic-Protokoll, wo nöd voll unterstützt wird. Bitte vorsichtig si, es chönd Problem ufträte.",
+      "description": "Dä Server benutzt e älteri Version vom Supernova-Protokoll, wo nöd voll unterstützt wird. Bitte vorsichtig si, es chönd Problem ufträte.",
       "skip": "Trotzdem fortfahre"
     },
     "buttons": {

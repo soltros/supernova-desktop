@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { queryKeys } from '@/utils/queryKeys'
 
 export const useGetArtist = (artistId: string) => {
   return useQuery({
     queryKey: [queryKeys.artist.single, artistId],
-    queryFn: () => subsonic.artists.getOne(artistId),
+    queryFn: () => supernova.artists.getOne(artistId),
     enabled: !!artistId,
   })
 }
@@ -13,7 +13,7 @@ export const useGetArtist = (artistId: string) => {
 export const useGetArtistInfo = (artistId: string) => {
   return useQuery({
     queryKey: [queryKeys.artist.info, artistId],
-    queryFn: () => subsonic.artists.getInfo(artistId),
+    queryFn: () => supernova.artists.getInfo(artistId),
     enabled: !!artistId,
   })
 }
@@ -21,7 +21,7 @@ export const useGetArtistInfo = (artistId: string) => {
 export const useGetTopSongs = (artistName?: string) => {
   return useQuery({
     queryKey: [queryKeys.artist.topSongs, artistName],
-    queryFn: () => subsonic.songs.getTopSongs(artistName ?? ''),
+    queryFn: () => supernova.songs.getTopSongs(artistName ?? ''),
     enabled: !!artistName,
   })
 }

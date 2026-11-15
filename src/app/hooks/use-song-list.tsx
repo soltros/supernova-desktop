@@ -1,8 +1,8 @@
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 
 export function useSongList() {
   async function getArtistSongCount(id: string) {
-    const response = await subsonic.artists.getOne(id)
+    const response = await supernova.artists.getOne(id)
     let count = 0
 
     if (!response || !response.album) return count
@@ -15,7 +15,7 @@ export function useSongList() {
   }
 
   async function getArtistAllSongs(name: string) {
-    const response = await subsonic.search.get({
+    const response = await supernova.search.get({
       query: name,
       songCount: 9999999,
       albumCount: 0,
@@ -28,7 +28,7 @@ export function useSongList() {
   }
 
   async function getAlbumSongs(albumId: string) {
-    const songs = await subsonic.albums.getOne(albumId)
+    const songs = await supernova.albums.getOne(albumId)
 
     if (!songs || !songs.song) return undefined
 

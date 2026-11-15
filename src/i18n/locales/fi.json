@@ -364,7 +364,7 @@
   "login": {
     "form": {
       "server": "Palvelin",
-      "description": "Yhdistä Subsonic-palvelimeesi.",
+      "description": "Yhdistä Supernova-palvelimeesi.",
       "url": "URL-osoite",
       "urlDescription": "Tämä on palvelimesi URL-osoite",
       "username": "Käyttäjänimi",
@@ -519,7 +519,7 @@
     "management": "Palvelimen hallinta",
     "incompatible": {
       "title": "Yhteensopimaton palvelin",
-      "description": "Tämä palvelin käyttää vanhempaa Subsonicin protokollaa joka ei ole täysin tuettu. Jatka varoen koska siitä voi seurata ongelmia.",
+      "description": "Tämä palvelin käyttää vanhempaa Supernovain protokollaa joka ei ole täysin tuettu. Jatka varoen koska siitä voi seurata ongelmia.",
       "skip": "Jatka joka tapauksessa"
     },
     "buttons": {

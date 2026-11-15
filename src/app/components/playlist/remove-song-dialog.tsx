@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/app/components/ui/alert-dialog'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlaylistRemoveSong } from '@/store/playlists.store'
 import { queryKeys } from '@/utils/queryKeys'
 
@@ -26,7 +26,7 @@ export function RemoveSongFromPlaylistDialog() {
   const queryClient = useQueryClient()
 
   const updateMutation = useMutation({
-    mutationFn: subsonic.playlists.update,
+    mutationFn: supernova.playlists.update,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.playlist.single, actionData.playlistId],

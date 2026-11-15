@@ -385,7 +385,7 @@
   "login": {
     "form": {
       "server": "Szerver",
-      "description": "Csatlakozz a Subsonic szerveredhez.",
+      "description": "Csatlakozz a Supernova szerveredhez.",
       "url": "URL",
       "urlDescription": "Ez a szervered URL-je",
       "username": "Felhasználónév",
@@ -540,7 +540,7 @@
     "management": "Szerver kezelés",
     "incompatible": {
       "title": "Nem kompatibilis szerver",
-      "description": "Ez a szerver a Subsonic protokoll egy régebbi verzióját használja, amely nem teljes mértékben támogatott. Kérjük, óvatosan folytasd, mert problémák léphetnek fel.",
+      "description": "Ez a szerver a Supernova protokoll egy régebbi verzióját használja, amely nem teljes mértékben támogatott. Kérjük, óvatosan folytasd, mert problémák léphetnek fel.",
       "skip": "Folytatás mégis"
     },
     "buttons": {

@@ -3,10 +3,9 @@ import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/app/components/ui/badge'
 import { CommandGroup, CommandItem } from '@/app/components/ui/command'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppStore } from '@/store/app.store'
 import dateTime from '@/utils/dateTime'
-import { checkServerType } from '@/utils/servers'
 
 async function delayedFn<T>(callback: () => T): Promise<T> {
   await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -15,15 +14,14 @@ async function delayedFn<T>(callback: () => T): Promise<T> {
 }
 
 const getScanStatus = async () => {
-  return await delayedFn(subsonic.library.getScanStatus)
+  return await delayedFn(supernova.library.getScanStatus)
 }
 const startScan = async () => {
-  return await delayedFn(subsonic.library.startScan)
+  return await delayedFn(supernova.library.startScan)
 }
 
 export function CommandServer() {
   const { t } = useTranslation()
-  const { isLms } = checkServerType()
 
   const {
     data: scanStatus,
@@ -54,7 +52,7 @@ export function CommandServer() {
   }
 
   const showLoader = isLoading || isFetching || isPending
-  const showBadges = !showLoader && scanStatus && !isLms
+  const showBadges = !showLoader && scanStatus
 
   return (
     <CommandGroup heading={t('server.management')}>
@@ -93,7 +91,10 @@ export function CommandServer() {
       <CommandItem disabled={showLoader} onSelect={() => refetch()}>
         {t('server.buttons.refresh')}
       </CommandItem>
-      <CommandItem disabled={showLoader} onSelect={() => handleStartScan()}>
+      <CommandItem
+        disabled={showLoader || !useAppStore.getState().data.isAdmin}
+        onSelect={() => handleStartScan()}
+      >
         {t('server.buttons.startScan')}
       </CommandItem>
     </CommandGroup>

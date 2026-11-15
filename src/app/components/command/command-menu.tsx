@@ -15,7 +15,7 @@ import {
 } from '@/app/components/ui/command'
 import { useMainSidebar } from '@/app/components/ui/main-sidebar'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppStore } from '@/store/app.store'
 import { byteLength } from '@/utils/byteLength'
 import { convertMinutesToMs } from '@/utils/convertSecondsToTime'
@@ -51,7 +51,7 @@ export default function CommandMenu() {
   const { data: searchResult } = useQuery({
     queryKey: [queryKeys.search, query],
     queryFn: () =>
-      subsonic.search.get({
+      supernova.search.get({
         query,
         albumCount: 4,
         artistCount: 4,

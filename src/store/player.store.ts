@@ -7,7 +7,7 @@ import { immer } from 'zustand/middleware/immer'
 import { shallow } from 'zustand/shallow'
 import { createWithEqualityFn } from 'zustand/traditional'
 import { scrobble } from '@/service/scrobble'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import {
   IPlayerContext,
   ISongList,
@@ -707,7 +707,7 @@ export const usePlayerStore = createWithEqualityFn<IPlayerContext>()(
 
               const { id, starred } = get().songlist.currentSong
               const isSongStarred = typeof starred === 'string'
-              await subsonic.star.handleStarItem({
+              await supernova.star.handleStarItem({
                 id,
                 starred: isSongStarred,
               })

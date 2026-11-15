@@ -1,7 +1,7 @@
 import { Disc3, Shuffle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/app/components/ui/button'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlayerActions } from '@/store/player.store'
 
 interface GenreButtonsProps {
@@ -13,7 +13,7 @@ export function GenreButtons({ genre }: GenreButtonsProps) {
   const { setSongList } = usePlayerActions()
 
   async function handleShuffleTracks() {
-    const songs = await subsonic.genres.getSongsByGenre({ genre })
+    const songs = await supernova.genres.getSongsByGenre({ genre })
 
     if (songs && songs.length > 0) {
       setSongList(songs, 0, true)
@@ -21,7 +21,7 @@ export function GenreButtons({ genre }: GenreButtonsProps) {
   }
 
   async function handleShuffleAlbums() {
-    const songs = await subsonic.songs.getRandomSongs({ genre, size: 500 })
+    const songs = await supernova.songs.getRandomSongs({ genre, size: 500 })
 
     if (songs && songs.length > 0) {
       setSongList(songs, 0, false)

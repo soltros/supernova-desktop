@@ -287,7 +287,7 @@
   "login": {
     "form": {
       "server": "服务器",
-      "description": "连接你的 Subsonic 服务器。",
+      "description": "连接你的 Supernova 服务器。",
       "password": "密码",
       "validations": {
         "url": "请输入一个有效的 URL。",
@@ -437,7 +437,7 @@
     },
     "incompatible": {
       "title": "不兼容的服务器",
-      "description": "此服务器使用的是较旧的 Subsonic 协议版本，该版本不被完全支持。请在操作时谨慎行事，您可能会遇到问题。",
+      "description": "此服务器使用的是较旧的 Supernova 协议版本，该版本不被完全支持。请在操作时谨慎行事，您可能会遇到问题。",
       "skip": "仍然继续"
     }
   },

@@ -8,7 +8,7 @@ import {
   ScrollArea,
   scrollAreaViewportSelector,
 } from '@/app/components/ui/scroll-area'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useLang } from '@/store/lang.store'
 import { usePlayerRef, usePlayerSonglist } from '@/store/player.store'
 import { ILyric } from '@/types/responses/song'
@@ -37,7 +37,7 @@ export function LyricsTab() {
   const { data: lyrics, isLoading } = useQuery({
     queryKey: [queryKeys.song.lyrics, artist, title, duration],
     queryFn: () =>
-      subsonic.lyrics.getLyrics({
+      supernova.lyrics.getLyrics({
         id,
         artist,
         title,

@@ -2,7 +2,7 @@ import { OptionsButtons } from '@/app/components/options/buttons'
 import { DownloadOptionHandler } from '@/app/components/options/download-handler'
 import { DropdownMenuSeparator } from '@/app/components/ui/dropdown-menu'
 import { useOptions } from '@/app/hooks/use-options'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useIsPlaylistPlaying, usePlayerActions } from '@/store/player.store'
 import { usePlaylists, useRemovePlaylist } from '@/store/playlists.store'
 import { PlaybackSource } from '@/types/playerContext'
@@ -54,7 +54,7 @@ export function PlaylistOptions({
     callback: GetSongsToQueueCallback,
     source?: PlaybackSource,
   ) {
-    const playlistWithEntries = await subsonic.playlists.getOne(playlist.id)
+    const playlistWithEntries = await supernova.playlists.getOne(playlist.id)
     if (!playlistWithEntries) return
 
     callback(playlistWithEntries.entry, source)
@@ -139,7 +139,7 @@ export function PlaylistOptions({
       <DownloadOptionHandler group={false}>
         <OptionsButtons.Download
           variant={variant}
-          disabled={disableDownload}
+          disabled={true || disableDownload}
           onClick={(e) => {
             e.stopPropagation()
             handleDownload()
@@ -153,7 +153,7 @@ export function PlaylistOptions({
           e.stopPropagation()
           handleEdit()
         }}
-        disabled={disableEdit}
+        disabled={true || disableEdit}
       />
       <OptionsButtons.RemovePlaylist
         variant={variant}

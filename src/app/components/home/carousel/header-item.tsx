@@ -9,7 +9,7 @@ import { ImageLoader } from '@/app/components/image-loader'
 import { Badge } from '@/app/components/ui/badge'
 import { Button } from '@/app/components/ui/button'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useIsAlbumPlaying, usePlayerActions } from '@/store/player.store'
 import { ISong } from '@/types/responses/song'
 import { convertSecondsToTime } from '@/utils/convertSecondsToTime'
@@ -19,7 +19,7 @@ export function HeaderItem({ song }: { song: ISong }) {
   const { isAlbumActive, isAlbumPlaying } = useIsAlbumPlaying(song.albumId)
 
   async function handlePlaySongAlbum() {
-    const album = await subsonic.albums.getOne(song.albumId)
+    const album = await supernova.albums.getOne(song.albumId)
 
     if (!album) return
 

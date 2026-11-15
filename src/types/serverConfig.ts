@@ -1,15 +1,9 @@
 import { SettingsOptions } from '@/app/components/settings/options'
 
-export enum AuthType {
-  PASSWORD,
-  TOKEN,
-}
-
 export interface IServerConfig {
   url: string
   username: string
   password: string
-  protocolVersion?: string
   serverType?: string
   extensionsSupported?: Record<string, number[]>
 }
@@ -48,8 +42,9 @@ interface IAppPages {
   setHomeLoopEnabled: (value: boolean) => void
 }
 
-export interface IAppData extends IServerConfig {
-  authType: AuthType | null
+export interface IAppData extends Omit<IServerConfig, 'password'> {
+  token: string
+  isAdmin: boolean
   isServerConfigured: boolean
   osType: string
   logoutDialogState: boolean
@@ -62,7 +57,6 @@ export interface IAppActions {
   setOsType: (value: string) => void
   setUrl: (value: string) => void
   setUsername: (value: string) => void
-  setPassword: (value: string) => void
   saveConfig: (data: IServerConfig) => Promise<boolean>
   removeConfig: () => void
   setLogoutDialogState: (value: boolean) => void

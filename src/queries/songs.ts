@@ -1,5 +1,5 @@
 import { SearchQueryOptions } from '@/service/search'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 
 const emptyResponse = { songs: [], nextOffset: null }
 
@@ -8,7 +8,7 @@ type SongSearchParams = Required<
 >
 
 export async function songsSearch(params: SongSearchParams) {
-  const response = await subsonic.search.get({
+  const response = await supernova.search.get({
     artistCount: 0,
     albumCount: 0,
     ...params,
@@ -29,12 +29,12 @@ export async function songsSearch(params: SongSearchParams) {
 }
 
 export async function getArtistAllSongs(artistId: string) {
-  const artist = await subsonic.artists.getOne(artistId)
+  const artist = await supernova.artists.getOne(artistId)
 
   if (!artist || !artist.album) return emptyResponse
 
   const results = await Promise.all(
-    artist.album.map(({ id }) => subsonic.albums.getOne(id)),
+    artist.album.map(({ id }) => supernova.albums.getOne(id)),
   )
 
   const songs = results.flatMap((result) => {
@@ -50,7 +50,7 @@ export async function getArtistAllSongs(artistId: string) {
 }
 
 export async function getFavoriteSongs() {
-  const response = await subsonic.songs.getFavoriteSongs()
+  const response = await supernova.songs.getFavoriteSongs()
 
   if (!response || !response.song) return { songs: [] }
 

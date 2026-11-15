@@ -1,18 +1,18 @@
 import { redirect } from 'react-router-dom'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppStore } from '@/store/app.store'
 
 export async function loginLoader() {
-  const { url, username, password, isServerConfigured } =
+  const { url, username, token, isServerConfigured } =
     useAppStore.getState().data
 
-  const hasUrl = url || url !== ''
-  const hasPassword = password || password !== ''
-  const hasUser = username || username !== ''
+  const hasUrl = Boolean(url)
+  const hasPassword = Boolean(token)
+  const hasUser = Boolean(username)
 
   if (hasUrl && hasPassword && hasUser && isServerConfigured) {
-    const isServerUp = await subsonic.ping.pingView()
+    const isServerUp = await supernova.ping.pingView()
     if (isServerUp) return redirect(ROUTES.LIBRARY.HOME)
   }
 

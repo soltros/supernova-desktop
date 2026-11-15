@@ -1,57 +1,41 @@
-import { httpClient } from '@/api/httpClient'
-import {
-  CreateRadio,
-  Radio,
-  RadioStationsResponse,
-} from '@/types/responses/radios'
-import { SubsonicResponse } from '@/types/responses/subsonicResponse'
-
-async function getAll() {
-  const response = await httpClient<RadioStationsResponse>(
-    '/getInternetRadioStations',
-    {
-      method: 'GET',
-    },
-  )
-
-  return response?.data.internetRadioStations.internetRadioStation || []
+import { request } from '@/api/httpClient'
+import { unsupported } from '@/api/models'
+import type { Radio, CreateRadio } from '@/types/responses/radios'
+interface Subscription {
+  id: string
+  station_id: string
+  url: string
+  name: string
 }
-
-async function create({ name, streamUrl, homePageUrl }: CreateRadio) {
-  await httpClient<SubsonicResponse>('/createInternetRadioStation', {
+async function getAll(): Promise<Radio[]> {
+  return (
+    (await request<Subscription[] | null>(
+      '/api/plugins/radio/subscriptions',
+    )) || []
+  ).map((s) => ({
+    id: s.station_id,
+    name: s.name,
+    streamUrl: s.url,
+    homePageUrl: '',
+  }))
+}
+async function create(d: CreateRadio) {
+  await request('/api/plugins/radio/subscriptions', {
     method: 'POST',
-    query: {
-      streamUrl,
-      name,
-      homepageUrl: homePageUrl,
-    },
+    body: JSON.stringify({
+      station_id: d.streamUrl,
+      url: d.streamUrl,
+      name: d.name,
+    }),
   })
 }
-
-async function update({ id, streamUrl, name, homePageUrl = '' }: Radio) {
-  await httpClient<SubsonicResponse>('/updateInternetRadioStation', {
-    method: 'GET',
-    query: {
-      id,
-      streamUrl,
-      name,
-      homepageUrl: homePageUrl,
-    },
-  })
-}
-
 async function remove(id: string) {
-  await httpClient<SubsonicResponse>('/deleteInternetRadioStation', {
-    method: 'GET',
-    query: {
-      id,
-    },
+  await request('/api/plugins/radio/subscriptions', {
+    method: 'DELETE',
+    query: { station_id: id },
   })
 }
-
-export const radios = {
-  getAll,
-  create,
-  update,
-  remove,
+async function update(_d: Radio) {
+  return unsupported('Editing radio subscriptions')
 }
+export const radios = { getAll, create, remove, update }

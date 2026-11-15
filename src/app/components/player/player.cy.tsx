@@ -198,7 +198,7 @@ describe('Player Component', () => {
   })
 
   it('should mount the player and change the progress slider', () => {
-    cy.intercept('/rest/scrobble**', { statusCode: 200 }).as('scrobbleRequest')
+    cy.intercept('/api/scrobbles**', { statusCode: 200 }).as('scrobbleRequest')
 
     cy.fixture('songs/random').then((songs: ISong[]) => {
       usePlayerStore.getState().actions.setSongList(songs, 0)
@@ -218,7 +218,7 @@ describe('Player Component', () => {
   })
 
   it('should mount the player and like the song', () => {
-    cy.intercept('/rest/star**', { statusCode: 200 }).as('starRequest')
+    cy.intercept('/api/hearts**', { statusCode: 200 }).as('starRequest')
 
     cy.fixture('songs/random').then((songs: ISong[]) => {
       usePlayerStore.getState().actions.setSongList(songs, 0)

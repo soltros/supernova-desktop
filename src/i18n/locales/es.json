@@ -301,7 +301,7 @@
   "login": {
     "form": {
       "server": "Servidor",
-      "description": "Conectar a su servidor de Subsonic.",
+      "description": "Conectar a su servidor de Supernova.",
       "username": "Nombre de usuario",
       "connect": "Conectar",
       "connecting": "Conectando…",
@@ -464,7 +464,7 @@
     "incompatible": {
       "skip": "Continuar de todas formas",
       "title": "Servidor incompatible",
-      "description": "El servidor usa una versión antigua de el protocolo Subsonic que no tiene soporte completo. Por favor, proceda con precaución ya que pueden aparecer problemas."
+      "description": "El servidor usa una versión antigua de el protocolo Supernova que no tiene soporte completo. Por favor, proceda con precaución ya que pueden aparecer problemas."
     }
   },
   "downloads": {

@@ -68,7 +68,6 @@ export function AudioPlayer({
     if (!audio) return
 
     logger.error('Audio load error', {
-      src: audio.src,
       networkState: audio.networkState,
       readyState: audio.readyState,
       error: audio.error,
@@ -101,7 +100,7 @@ export function AudioPlayer({
   useEffect(() => {
     async function handleSong() {
       const audio = audioRef.current
-      if (!audio) return
+      if (!audio || !props.src) return
 
       try {
         if (isPlaying) {
@@ -116,7 +115,15 @@ export function AudioPlayer({
       }
     }
     if (isSong || isPodcast) handleSong()
-  }, [audioRef, handleSongError, isPlaying, isSong, isPodcast, resumeContext])
+  }, [
+    audioRef,
+    handleSongError,
+    isPlaying,
+    isSong,
+    isPodcast,
+    resumeContext,
+    props.src,
+  ])
 
   useEffect(() => {
     async function handleRadio() {

@@ -211,7 +211,7 @@
       "password": "Heslo",
       "server": "Server",
       "username": "Uživatelské jméno",
-      "description": "Připoj se ke svému Subsonic serveru.",
+      "description": "Připoj se ke svému Supernova serveru.",
       "url": "URL",
       "urlDescription": "Toto je URL tvého serveru"
     }
@@ -367,7 +367,7 @@
     "status": "Stav",
     "incompatible": {
       "title": "Nekompatibilní server",
-      "description": "Tento server používá starší verzi Subsonic protokolu, která není plně podporovaná. Buď prosím opatrný, protože mohou nastat problémy.",
+      "description": "Tento server používá starší verzi Supernova protokolu, která není plně podporovaná. Buď prosím opatrný, protože mohou nastat problémy.",
       "skip": "Přesto pokračovat"
     },
     "buttons": {

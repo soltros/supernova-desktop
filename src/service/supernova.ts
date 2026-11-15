@@ -11,7 +11,7 @@ import { search } from './search'
 import { songs } from './songs'
 import { star } from './star'
 
-export const subsonic = {
+export const supernova = {
   albums,
   artists,
   genres,

@@ -1,5 +1,3 @@
-import { SubsonicResponse } from './subsonicResponse'
-
 export interface Genre {
   value: string
   songCount: number
@@ -9,5 +7,3 @@ export interface Genre {
 export interface Genres {
   genre: Genre[]
 }
-
-export interface GenresResponse extends SubsonicResponse<{ genres: Genres }> {}

@@ -1,9 +1,11 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
-import { ISupernova DesktopAPI, IpcChannels, PlayerStateListenerActions } from './types'
+import { ISupernovaAPI, IpcChannels, PlayerStateListenerActions } from './types'
 
 // Custom APIs for renderer
-const api: ISupernova DesktopAPI = {
+const api: ISupernovaAPI = {
+  supernovaRequest: (payload) =>
+    ipcRenderer.invoke('supernova:request', payload),
   enterFullScreen: () => ipcRenderer.send(IpcChannels.ToggleFullscreen, true),
   exitFullScreen: () => ipcRenderer.send(IpcChannels.ToggleFullscreen, false),
   isFullScreen: () => ipcRenderer.invoke(IpcChannels.IsFullScreen),

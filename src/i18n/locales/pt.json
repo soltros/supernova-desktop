@@ -255,7 +255,7 @@
     "management": "Gestão do servidor",
     "incompatible": {
       "title": "Servidor incompatível",
-      "description": "Este servidor usa uma versão mais antiga do protocolo Subsonic que não é totalmente compatível. Por favor, proceda com cautela, pois pode enfrentar problemas.",
+      "description": "Este servidor usa uma versão mais antiga do protocolo Supernova que não é totalmente compatível. Por favor, proceda com cautela, pois pode enfrentar problemas.",
       "skip": "Continuar mesmo assim"
     },
     "buttons": {
@@ -617,7 +617,7 @@
   "login": {
     "form": {
       "server": "Servidor",
-      "description": "Conecte-se ao seu servidor Subsonic.",
+      "description": "Conecte-se ao seu servidor Supernova.",
       "url": "URL",
       "urlDescription": "Esta é a URL do seu servidor",
       "username": "Nome de utilizador",

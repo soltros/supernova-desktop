@@ -1,5 +1,4 @@
 import { IFeaturedArtist } from './artist'
-import { SubsonicResponse } from './subsonicResponse'
 
 export interface IReplayGain {
   trackGain: number
@@ -91,18 +90,3 @@ export interface ISong {
 export interface SongList {
   song: ISong[]
 }
-
-export interface RandomSongsResponse
-  extends SubsonicResponse<{ randomSongs: SongList }> {}
-
-export interface TopSongsResponse
-  extends SubsonicResponse<{ topSongs: SongList }> {}
-
-export interface FavoritesResponse
-  extends SubsonicResponse<{ starred2: SongList }> {}
-
-export interface LyricsResponse extends SubsonicResponse<{ lyrics: ILyric }> {}
-export interface StructuredLyricsResponse
-  extends SubsonicResponse<{ lyricsList: ILyricsList }> {}
-
-export interface GetSongResponse extends SubsonicResponse<{ song: ISong }> {}

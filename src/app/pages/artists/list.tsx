@@ -11,7 +11,7 @@ import { MainViewTypeSelector } from '@/app/components/main-grid'
 import { DataTable } from '@/app/components/ui/data-table'
 import { useSongList } from '@/app/hooks/use-song-list'
 import { artistsColumns } from '@/app/tables/artists-columns'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppArtistsViewType } from '@/store/app.store'
 import { usePlayerActions } from '@/store/player.store'
 import { ISimilarArtist } from '@/types/responses/artist'
@@ -38,7 +38,7 @@ export default function ArtistsList() {
 
   const { data: artists, isLoading } = useQuery({
     queryKey: [queryKeys.artist.all],
-    queryFn: subsonic.artists.getAll,
+    queryFn: supernova.artists.getAll,
   })
 
   async function handlePlayArtistRadio(artist: ISimilarArtist) {

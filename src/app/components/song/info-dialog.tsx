@@ -14,7 +14,7 @@ import {
 } from '@/app/components/ui/dialog'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useSongInfo } from '@/store/ui.store'
 import { formatBitrate, formatSamplingRate } from '@/utils/audioInfo'
 import { convertSecondsToTime } from '@/utils/convertSecondsToTime'
@@ -29,7 +29,7 @@ export function SongInfoDialog() {
 
   const { data: song, isLoading } = useQuery({
     queryKey: [queryKeys.song.info, songId],
-    queryFn: () => subsonic.songs.getSong(songId),
+    queryFn: () => supernova.songs.getSong(songId),
     enabled: modalOpen,
   })
 
@@ -37,7 +37,7 @@ export function SongInfoDialog() {
 
   const { data: album, isLoading: albumLoading } = useQuery({
     queryKey: [queryKeys.album.single, song?.albumId],
-    queryFn: () => subsonic.albums.getOne(song?.albumId ?? ''),
+    queryFn: () => supernova.albums.getOne(song?.albumId ?? ''),
     enabled: loadedAlbumId,
   })
 

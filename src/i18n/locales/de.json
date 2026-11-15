@@ -236,7 +236,7 @@
       "url": "URL",
       "urlDescription": "Dies ist Ihre Server-URL",
       "server": "Server",
-      "description": "Verbinden Sie sich mit Ihrem Subsonic-Server.",
+      "description": "Verbinden Sie sich mit Ihrem Supernova-Server.",
       "username": "Benutzername",
       "usernamePlaceholder": "Ihr Benutzername",
       "password": "Passwort",
@@ -466,7 +466,7 @@
     },
     "incompatible": {
       "title": "Inkompatibler Server",
-      "description": "Dieser Server verwendet eine ältere Version des Subsonic-Protokolls, die nicht vollständig unterstützt wird. Bitte seien Sie achtsam, es können Probleme auftreten.",
+      "description": "Dieser Server verwendet eine ältere Version des Supernova-Protokolls, die nicht vollständig unterstützt wird. Bitte seien Sie achtsam, es können Probleme auftreten.",
       "skip": "Trotzdem fortfahren"
     }
   },

@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppStore } from '@/store/app.store'
 import { convertMinutesToMs } from '@/utils/convertSecondsToTime'
 import { queryKeys } from '@/utils/queryKeys'
 
 async function fetchSongs(offset: number, count: number) {
-  const response = await subsonic.search.get({
+  const response = await supernova.search.get({
     artistCount: 0,
     albumCount: 0,
     songCount: count,

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMatches } from 'react-router-dom'
 import { getDownloadUrl } from '@/api/httpClient'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlayerActions } from '@/store/player.store'
 import { usePlaylistRemoveSong } from '@/store/playlists.store'
 import { useSongInfo } from '@/store/ui.store'
@@ -38,8 +38,8 @@ export function useOptions() {
     setLastOnQueue(list)
   }
 
-  function startDownload(id: string) {
-    const url = getDownloadUrl(id)
+  async function startDownload(id: string, kind: 'track' | 'album' = 'track') {
+    const url = await getDownloadUrl(id, kind)
 
     if (isDesktop()) {
       downloadDesktop(url, id)
@@ -49,7 +49,7 @@ export function useOptions() {
   }
 
   const updateMutation = useMutation({
-    mutationFn: subsonic.playlists.update,
+    mutationFn: supernova.playlists.update,
     onSuccess: () => {
       if (isOnPlaylistPage) {
         queryClient.invalidateQueries({
@@ -67,7 +67,7 @@ export function useOptions() {
   }
 
   const createMutation = useMutation({
-    mutationFn: subsonic.playlists.createWithDetails,
+    mutationFn: supernova.playlists.createWithDetails,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.playlist.all],

@@ -13,7 +13,7 @@ import ListWrapper from '@/app/components/list-wrapper'
 import { StickyHeader } from '@/app/components/sticky-header'
 import { useDetectSticky } from '@/app/hooks/use-detect-sticky'
 import ErrorPage from '@/app/pages/error-page'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { saveGridClickedItem } from '@/utils/gridTools'
 import { queryKeys } from '@/utils/queryKeys'
 
@@ -28,7 +28,7 @@ export default function Genre() {
   const { data, isLoading, isFetched } = useQuery({
     queryKey: [queryKeys.genre.albums, genre],
     queryFn: () =>
-      subsonic.albums.getAlbumList({ type: 'byGenre', genre, size: 500 }),
+      supernova.albums.getAlbumList({ type: 'byGenre', genre, size: 500 }),
     enabled: !!genre,
     gcTime: 0,
   })

@@ -4,7 +4,7 @@ import { EqualizerBars } from '@/app/components/icons/equalizer-bars'
 import { ImageLoader } from '@/app/components/image-loader'
 import { PreviewCard } from '@/app/components/preview-card/card'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useIsAlbumPlaying, usePlayerActions } from '@/store/player.store'
 import { Albums } from '@/types/responses/album'
 
@@ -17,7 +17,7 @@ function AlbumCard({ album }: AlbumCardProps) {
   const { isAlbumActive, isAlbumPlaying } = useIsAlbumPlaying(album.id)
 
   async function playCurrentAlbum() {
-    const response = await subsonic.albums.getOne(album.id)
+    const response = await supernova.albums.getOne(album.id)
 
     if (response) {
       setSongList(response.song, 0, false, {

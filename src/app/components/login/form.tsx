@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { toast } from 'react-toastify'
 import { z } from 'zod'
-import { queryServerInfo } from '@/api/queryServerInfo'
 import { LangToggle } from '@/app/components/login/lang-toggle'
 import { Button } from '@/app/components/ui/button'
 import {
@@ -20,13 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/app/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/app/components/ui/dialog'
+
 import {
   Form,
   FormControl,
@@ -40,7 +33,6 @@ import { Input } from '@/app/components/ui/input'
 import { Password } from '@/app/components/ui/password'
 import { ROUTES } from '@/routes/routesList'
 import { useAppActions, useAppData } from '@/store/app.store'
-import { isDesktop } from '@/utils/desktop'
 import { removeSlashFromUrl } from '@/utils/removeSlashFromUrl'
 
 const loginSchema = z.object({
@@ -56,13 +48,12 @@ const loginSchema = z.object({
 
 type FormData = z.infer<typeof loginSchema>
 
-const defaultUrl = isDesktop() ? 'http://' : 'https://'
+const defaultUrl = 'http://localhost:8080'
 const url = window.SERVER_URL || defaultUrl
 const urlIsValid = url !== defaultUrl
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false)
-  const [serverIsIncompatible, setServerIsIncompatible] = useState(false)
   const { saveConfig } = useAppActions()
   const { hideServer } = useAppData()
   const navigate = useNavigate()
@@ -80,20 +71,8 @@ export function LoginForm() {
     },
   })
 
-  async function onSubmit(data: FormData, forceCompatible?: boolean) {
+  async function onSubmit(data: FormData) {
     setLoading(true)
-
-    // Check if server is compatible
-    const serverInfo = await queryServerInfo(removeSlashFromUrl(data.url))
-
-    // If server version is lower than 1.15.0
-    if (serverInfo.protocolVersionNumber < 1150 && forceCompatible !== true) {
-      setServerIsIncompatible(true)
-      setLoading(false)
-      return
-    } else {
-      setServerIsIncompatible(false)
-    }
 
     const status = await saveConfig({
       ...data,
@@ -210,24 +189,6 @@ export function LoginForm() {
           </form>
         </Form>
       </Card>
-      <Dialog
-        open={serverIsIncompatible}
-        onOpenChange={(state) => {
-          setServerIsIncompatible(state)
-        }}
-      >
-        <DialogContent className="max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{t('server.incompatible.title')}</DialogTitle>
-          </DialogHeader>
-          <p>{t('server.incompatible.description')}</p>
-          <DialogFooter>
-            <Button onClick={form.handleSubmit((data) => onSubmit(data, true))}>
-              {t('server.incompatible.skip')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }

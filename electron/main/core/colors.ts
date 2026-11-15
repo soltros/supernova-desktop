@@ -1,11 +1,11 @@
 import { electron } from '../../../package.json'
-import { Supernova DesktopStore } from './store'
+import { SupernovaStore } from './store'
 
 interface State {
   bgColor: string
 }
 
-const colorsStore = new Supernova DesktopStore<State>({
+const colorsStore = new SupernovaStore<State>({
   name: 'colors',
   defaults: {
     bgColor: electron.window.defaultBgColor,

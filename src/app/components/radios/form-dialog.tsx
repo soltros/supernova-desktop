@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from '@/app/components/ui/form'
 import { Input } from '@/app/components/ui/input'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useRadios } from '@/store/radios.store'
 import { Radio } from '@/types/responses/radios'
 import { queryKeys } from '@/utils/queryKeys'
@@ -81,7 +81,7 @@ export function RadioFormDialog() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: subsonic.radios.create,
+    mutationFn: supernova.radios.create,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.radio.all],
@@ -94,7 +94,7 @@ export function RadioFormDialog() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: subsonic.radios.update,
+    mutationFn: supernova.radios.update,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.radio.all],

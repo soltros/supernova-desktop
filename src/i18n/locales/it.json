@@ -315,7 +315,7 @@
       "connect": "Connessione",
       "connecting": "Connessione in corso…",
       "server": "Server",
-      "description": "Collegati al tuo server Subsonic.",
+      "description": "Collegati al tuo server Supernova.",
       "url": "URL",
       "urlDescription": "Questo è l'URL del tuo server",
       "username": "Nome utente",
@@ -548,7 +548,7 @@
     "management": "Gestione server",
     "incompatible": {
       "title": "Server incompatibile",
-      "description": "Questo server utilizza una versione precedente del protocollo Subsonic che non è completamente supportata. Procedere con cautela poiché potrebbero verificarsi dei problemi.",
+      "description": "Questo server utilizza una versione precedente del protocollo Supernova che non è completamente supportata. Procedere con cautela poiché potrebbero verificarsi dei problemi.",
       "skip": "Continua comunque"
     },
     "buttons": {

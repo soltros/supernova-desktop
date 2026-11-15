@@ -1,3 +1,4 @@
+import { installApiBridge } from './core/supernova'
 import { is, platform } from '@electron-toolkit/utils'
 import { BrowserWindow } from 'electron'
 import { join } from 'path'
@@ -37,13 +38,31 @@ export function createWindow(): void {
     trafficLightPosition: { x: 15, y: 14 },
     icon: appIcon(),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.mjs'),
-      sandbox: false,
+      preload: join(__dirname, '../preload/index.cjs'),
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   })
 
+  installApiBridge(mainWindow)
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (url.split('#')[0] !== mainWindow?.webContents.getURL().split('#')[0])
+      event.preventDefault()
+  })
+  mainWindow.webContents.on('will-attach-webview', (event) =>
+    event.preventDefault(),
+  )
+  mainWindow.webContents.session.setPermissionRequestHandler(
+    (_contents, _permission, callback) => callback(false),
+  )
   // set initial state
-  playerState.setAll({ isPlaying: false, hasSonglist: false, hasPrevious: false, hasNext: false })
+  playerState.setAll({
+    isPlaying: false,
+    hasSonglist: false,
+    hasPrevious: false,
+    hasNext: false,
+  })
 
   createTray()
   updateDockMenu()

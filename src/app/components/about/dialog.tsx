@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@/app/components/ui/dialog'
 import githubIcon from '@/assets/icons/github-mark-white.svg'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { getAppInfo } from '@/utils/appName'
 import { queryKeys } from '@/utils/queryKeys'
 
@@ -25,7 +25,7 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
 
   const { data: server, isLoading } = useQuery({
     queryKey: [queryKeys.update.serverInfo],
-    queryFn: subsonic.ping.pingInfo,
+    queryFn: supernova.ping.pingInfo,
   })
 
   return (

@@ -1,10 +1,10 @@
 import { AlbumListParams } from '@/service/albums'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 
 const emptyResponse = { albums: [], nextOffset: null, albumsCount: 0 }
 
 export async function getArtistDiscography(artistId: string) {
-  const response = await subsonic.artists.getOne(artistId)
+  const response = await supernova.artists.getOne(artistId)
 
   if (!response || !response.album) return emptyResponse
 
@@ -22,7 +22,7 @@ interface AlbumSearch {
 }
 
 export async function albumSearch({ query, count, offset }: AlbumSearch) {
-  const response = await subsonic.search.get({
+  const response = await supernova.search.get({
     query,
     songCount: 0,
     artistCount: 0,
@@ -46,7 +46,7 @@ export async function albumSearch({ query, count, offset }: AlbumSearch) {
 }
 
 export async function getAlbumList(params: Required<AlbumListParams>) {
-  const response = await subsonic.albums.getAlbumList(params)
+  const response = await supernova.albums.getAlbumList(params)
 
   if (!response) return emptyResponse
   if (!response.list) return emptyResponse

@@ -5,7 +5,6 @@ import { ImageLoader } from '@/app/components/image-loader'
 import { ROUTES } from '@/routes/routesList'
 import { IFeaturedArtist } from '@/types/responses/artist'
 import { ALBUM_ARTISTS_MAX_NUMBER } from '@/utils/multipleArtists'
-import { checkServerType } from '@/utils/servers'
 
 type AlbumArtistProps = {
   id: string
@@ -27,11 +26,10 @@ export function AlbumMultipleArtistsInfo({
   artists,
 }: MultipleArtistsInfoProps) {
   const data = artists.slice(0, ALBUM_ARTISTS_MAX_NUMBER)
-  const { isLms } = checkServerType()
 
   return (
     <div className="flex items-center gap-2">
-      {!isLms && (
+      {true && (
         <div className="flex items-center -space-x-0.5">
           {data.map(({ id, name }) => (
             <div key={`artist-image-${id}`} className="rounded-full">
@@ -53,12 +51,6 @@ export function AlbumMultipleArtistsInfo({
 }
 
 function ArtistImage({ id, name }: AlbumArtistProps) {
-  const { isLms } = checkServerType()
-
-  // LMS server (https://github.com/epoupon/lms) does not support
-  // retrieving artist images using the artist's own ID.
-  if (isLms) return null
-
   return (
     <div className="size-6 min-w-6 min-h-6 rounded-full bg-accent">
       <ImageLoader id={id} type="artist" size={100}>

@@ -1,7 +1,7 @@
 import { PlayerStatePayload } from '../../preload/types'
-import { Supernova DesktopStore } from './store'
+import { SupernovaStore } from './store'
 
-const playerStore = new Supernova DesktopStore<PlayerStatePayload>({
+const playerStore = new SupernovaStore<PlayerStatePayload>({
   name: 'player',
   defaults: {
     isPlaying: false,

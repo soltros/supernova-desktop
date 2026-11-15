@@ -1,23 +1,9 @@
-import { httpClient } from '@/api/httpClient'
-import { SubsonicResponse } from '@/types/responses/subsonicResponse'
-import dateTime from '@/utils/dateTime'
-import { logger } from '@/utils/logger'
-
+import { request } from '@/api/httpClient'
 async function send(id: string, submission = true) {
-  logger.info(`${submission ? 'Scrobbling' : 'Syncing'} song with server`, {
-    submission,
-  })
-
-  await httpClient<SubsonicResponse>('/scrobble', {
-    method: 'GET',
-    query: {
-      id,
-      submission: submission ? 'true' : 'false',
-      time: dateTime().valueOf().toString(),
-    },
-  })
+  if (submission)
+    await request('/api/scrobbles', {
+      method: 'POST',
+      body: JSON.stringify({ track_id: id }),
+    })
 }
-
-export const scrobble = {
-  send,
-}
+export const scrobble = { send }

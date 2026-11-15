@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/app/components/ui/button'
 import { useRefreshFavorites } from '@/app/hooks/use-refresh-favorites'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import {
   usePlayerActions,
   usePlayerMediaType,
@@ -42,8 +42,9 @@ export function TableLikeButton({
   async function handleStarred() {
     const state = !isStarred
 
-    await subsonic.star.handleStarItem({
+    await supernova.star.handleStarItem({
       id: entityId,
+      entityType: type === 'artist' ? 'artist' : 'track',
       starred: isStarred,
     })
     setIsStarred(state)

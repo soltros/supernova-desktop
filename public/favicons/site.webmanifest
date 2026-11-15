@@ -1,9 +1,12 @@
 {
-  "name": "Aonsoku",
-  "short_name": "Aonsoku",
-  "description": "A modern desktop client for Navidrome/Subsonic servers.",
+  "name": "Supernova Desktop",
+  "short_name": "Supernova",
+  "description": "Desktop music client for Supernova servers.",
   "theme_color": "#060E23",
-  "categories": ["music", "entertainment"],
+  "categories": [
+    "music",
+    "entertainment"
+  ],
   "background_color": "#20b358",
   "start_url": "/",
   "display": "standalone",

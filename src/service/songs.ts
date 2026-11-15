@@ -1,84 +1,64 @@
-import { httpClient } from '@/api/httpClient'
+import { pages, request } from '@/api/httpClient'
 import {
-  FavoritesResponse,
-  GetSongResponse,
-  RandomSongsResponse,
-  TopSongsResponse,
-} from '@/types/responses/song'
-import { search } from './search'
-
-interface GetRandomSongsParams {
+  NativeTrack,
+  NativeAlbum,
+  NativeArtist,
+  songModel,
+  albumModel,
+  artistModel,
+} from '@/api/models'
+async function getAllSongs(count = Infinity) {
+  return (await pages<NativeTrack>('/api/tracks', {}, count)).map((t) =>
+    songModel(t),
+  )
+}
+async function getSong(id: string) {
+  const tracks = await pages<NativeTrack>('/api/tracks')
+  const t = tracks.find((t) => t.id === id)
+  if (!t) throw new Error('Track not found')
+  return songModel(t)
+}
+async function getRandomSongs({
+  size = 10,
+}: {
   size?: number
   genre?: string
   fromYear?: number
   toYear?: number
+}) {
+  const tracks = await getAllSongs()
+  for (let i = tracks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[tracks[i], tracks[j]] = [tracks[j], tracks[i]]
+  }
+  return tracks.slice(0, size)
 }
-
-async function getRandomSongs({
-  size,
-  genre,
-  fromYear,
-  toYear,
-}: GetRandomSongsParams) {
-  const response = await httpClient<RandomSongsResponse>('/getRandomSongs', {
-    method: 'GET',
-    query: {
-      size: size?.toString(),
-      genre,
-      fromYear: fromYear?.toString(),
-      toYear: toYear?.toString(),
-    },
-  })
-
-  return response?.data.randomSongs.song
-}
-
 async function getFavoriteSongs() {
-  const response = await httpClient<FavoritesResponse>('/getStarred2', {
-    method: 'GET',
-  })
-
-  return response?.data.starred2
+  const d = await request<{
+    tracks: NativeTrack[]
+    albums: NativeAlbum[]
+    artists: NativeArtist[]
+  }>('/api/hearts/details')
+  const starred = new Date().toISOString()
+  return {
+    song: (d.tracks || []).map((t) => ({ ...songModel(t), starred })),
+    album: (d.albums || []).map((a) => ({ ...albumModel(a), starred })),
+    artist: (d.artists || []).map((a) => ({ ...artistModel(a), starred })),
+  }
 }
-
-async function getTopSongs(artistName: string) {
-  const response = await httpClient<TopSongsResponse>('/getTopSongs', {
-    method: 'GET',
-    query: {
-      artist: artistName,
-    },
-  })
-
-  return response?.data.topSongs.song
+async function getTopSongs(name: string) {
+  const artists = await pages<NativeArtist>('/api/artists')
+  const artist = artists.find((a) => a.name === name)
+  return artist
+    ? (
+        await pages<NativeTrack>('/api/tracks', { artist_id: artist.id }, 50)
+      ).map((t) => songModel(t))
+    : []
 }
-
-async function getAllSongs(songCount: number) {
-  const response = await search.get({
-    query: '',
-    albumCount: 0,
-    artistCount: 0,
-    songCount,
-    songOffset: 0,
-  })
-
-  return response?.song ?? []
-}
-
-async function getSong(id: string) {
-  const response = await httpClient<GetSongResponse>('/getSong', {
-    method: 'GET',
-    query: {
-      id,
-    },
-  })
-
-  return response?.data.song
-}
-
 export const songs = {
   getAllSongs,
-  getFavoriteSongs,
-  getRandomSongs,
-  getTopSongs,
   getSong,
+  getRandomSongs,
+  getFavoriteSongs,
+  getTopSongs,
 }

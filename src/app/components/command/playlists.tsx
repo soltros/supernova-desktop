@@ -6,7 +6,7 @@ import { Dot } from '@/app/components/dot'
 import { ImageLoader } from '@/app/components/image-loader'
 import { CommandGroup, CommandItem } from '@/app/components/ui/command'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { Playlist } from '@/types/responses/playlist'
 import { convertSecondsToHumanRead } from '@/utils/convertSecondsToTime'
 import { queryKeys } from '@/utils/queryKeys'
@@ -18,7 +18,7 @@ export function CommandPlaylists({ runCommand }: CommandItemProps) {
 
   const { data: playlists } = useQuery({
     queryKey: [queryKeys.playlist.all],
-    queryFn: subsonic.playlists.getAll,
+    queryFn: supernova.playlists.getAll,
   })
 
   if (!playlists || playlists.length === 0) return null

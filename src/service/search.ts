@@ -1,7 +1,12 @@
-import { httpClient } from '@/api/httpClient'
-import { useAppStore } from '@/store/app.store'
-import { ISearchResponse } from '@/types/responses/search'
-
+import { pages, request } from '@/api/httpClient'
+import {
+  NativeTrack,
+  NativeAlbum,
+  NativeArtist,
+  songModel,
+  albumModel,
+  artistModel,
+} from '@/api/models'
 export interface SearchQueryOptions {
   query?: string
   artistCount?: number
@@ -11,7 +16,6 @@ export interface SearchQueryOptions {
   songCount?: number
   songOffset?: number
 }
-
 async function get({
   query = '',
   artistCount = 20,
@@ -21,26 +25,39 @@ async function get({
   songCount = 20,
   songOffset = 0,
 }: SearchQueryOptions) {
-  // Navidrome expects double quotes "" but other servers expect an empty string
-  const serverType = useAppStore.getState().data.serverType
-  const searchAllQuery = serverType === 'navidrome' ? '""' : ''
-
-  const response = await httpClient<ISearchResponse>('/search3', {
-    method: 'GET',
-    query: {
-      query: query || searchAllQuery,
-      artistCount: artistCount.toString(),
-      artistOffset: artistOffset.toString(),
-      albumCount: albumCount.toString(),
-      albumOffset: albumOffset.toString(),
-      songCount: songCount.toString(),
-      songOffset: songOffset.toString(),
-    },
-  })
-
-  return response?.data.searchResult3
+  if (query) {
+    const d = await request<{
+      tracks: NativeTrack[]
+      albums: NativeAlbum[]
+      artists: NativeArtist[]
+    }>('/api/search', { query: { q: query } })
+    return {
+      song: (d.tracks || [])
+        .slice(songOffset, songOffset + songCount)
+        .map((t) => songModel(t)),
+      album: (d.albums || [])
+        .slice(albumOffset, albumOffset + albumCount)
+        .map(albumModel),
+      artist: (d.artists || [])
+        .slice(artistOffset, artistOffset + artistCount)
+        .map(artistModel),
+    }
+  }
+  const [tracks, albums, artists] = await Promise.all([
+    songCount
+      ? pages<NativeTrack>('/api/tracks', {}, songCount, songOffset)
+      : [],
+    albumCount
+      ? pages<NativeAlbum>('/api/albums', {}, albumCount, albumOffset)
+      : [],
+    artistCount
+      ? pages<NativeArtist>('/api/artists', {}, artistCount, artistOffset)
+      : [],
+  ])
+  return {
+    song: tracks.map((t) => songModel(t)),
+    album: albums.map(albumModel),
+    artist: artists.map(artistModel),
+  }
 }
-
-export const search = {
-  get,
-}
+export const search = { get }

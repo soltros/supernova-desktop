@@ -1,6 +1,5 @@
 import { IFeaturedArtist } from './artist'
 import { ISong } from './song'
-import { SubsonicResponse } from './subsonicResponse'
 
 export interface Genre {
   name: string
@@ -54,12 +53,6 @@ export interface AlbumList {
   album: Albums[]
 }
 
-export interface AlbumListResponse
-  extends SubsonicResponse<{ albumList2: AlbumList }> {}
-
-export interface GetAlbumResponse
-  extends SubsonicResponse<{ album: SingleAlbum }> {}
-
 export interface IAlbumInfo {
   notes?: string
   musicBrainzId?: string
@@ -68,9 +61,6 @@ export interface IAlbumInfo {
   mediumImageUrl?: string
   largeImageUrl?: string
 }
-
-export interface AlbumInfoResponse
-  extends SubsonicResponse<{ albumInfo: IAlbumInfo }> {}
 
 export type AlbumListType =
   | 'random'

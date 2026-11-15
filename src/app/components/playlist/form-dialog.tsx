@@ -26,7 +26,7 @@ import {
 import { Input } from '@/app/components/ui/input'
 import { Switch } from '@/app/components/ui/switch'
 import { Textarea } from '@/app/components/ui/textarea'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlaylists } from '@/store/playlists.store'
 import { PlaylistData } from '@/types/playlistsContext'
 import { queryKeys } from '@/utils/queryKeys'
@@ -42,7 +42,7 @@ type PlaylistSchema = z.infer<typeof playlistSchema>
 const defaultValues: PlaylistSchema = {
   name: '',
   comment: '',
-  isPublic: true,
+  isPublic: false,
 }
 
 export function CreatePlaylistDialog() {
@@ -72,7 +72,7 @@ export function CreatePlaylistDialog() {
   const queryClient = useQueryClient()
 
   const createMutation = useMutation({
-    mutationFn: subsonic.playlists.createWithDetails,
+    mutationFn: supernova.playlists.createWithDetails,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.playlist.all],
@@ -85,7 +85,7 @@ export function CreatePlaylistDialog() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: subsonic.playlists.update,
+    mutationFn: supernova.playlists.update,
     onSuccess: () => {
       Promise.all([
         queryClient.invalidateQueries({
@@ -164,6 +164,7 @@ export function CreatePlaylistDialog() {
               <FormField
                 control={form.control}
                 name="comment"
+                disabled
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('playlist.form.labels.comment')}</FormLabel>
@@ -184,6 +185,7 @@ export function CreatePlaylistDialog() {
               <FormField
                 control={form.control}
                 name="isPublic"
+                disabled
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-accent/40">
                     <div>

@@ -4,20 +4,13 @@ import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { shallow } from 'zustand/shallow'
 import { createWithEqualityFn } from 'zustand/traditional'
-import { pingServer } from '@/api/pingServer'
-import { queryServerInfo } from '@/api/queryServerInfo'
-import { AuthType, IAppContext, IServerConfig } from '@/types/serverConfig'
+import { request, requestAt, normalizeServerUrl } from '@/api/httpClient'
+import { IAppContext, IServerConfig } from '@/types/serverConfig'
 import { isDesktop } from '@/utils/desktop'
 import { discordRpc } from '@/utils/discordRpc'
 import { logger } from '@/utils/logger'
-import {
-  genEncodedPassword,
-  genPassword,
-  genPasswordToken,
-  genUser,
-  getAuthType,
-  hasValidConfig,
-} from '@/utils/salt'
+const hasValidConfig = false
+const genUser = () => ''
 
 const {
   SERVER_URL,
@@ -25,11 +18,9 @@ const {
   HIDE_ARTISTS_SECTION,
   HIDE_SONGS_SECTION,
   HIDE_ALBUMS_SECTION,
-  HIDE_GENRES_SECTION,
   HIDE_FAVORITES_SECTION,
   HIDE_PLAYLISTS_SECTION,
   HIDE_RADIOS_SECTION,
-  SERVER_TYPE,
   IMAGE_CACHE_ENABLED,
 } = window
 
@@ -45,10 +36,9 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
             osType: '',
             url: SERVER_URL ?? '',
             username: genUser(),
-            password: genPassword(),
-            authType: getAuthType(),
-            protocolVersion: '1.16.0',
-            serverType: SERVER_TYPE ?? 'subsonic',
+            token: '',
+            isAdmin: false,
+            serverType: 'supernova',
             logoutDialogState: false,
             hideServer: HIDE_SERVER ?? false,
             lockUser: hasValidConfig,
@@ -175,7 +165,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.pages.hideAlbumsSection = value
               })
             },
-            hideGenresSection: HIDE_GENRES_SECTION ?? false,
+            hideGenresSection: true,
             setHideGenresSection: (value) => {
               set((state) => {
                 state.pages.hideGenresSection = value
@@ -217,7 +207,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.pages.lyricsCacheEnabled = value
               })
             },
-            mediaCacheEnabled: true,
+            mediaCacheEnabled: false,
             setMediaCacheEnabled: (value) => {
               set((state) => {
                 state.pages.mediaCacheEnabled = value
@@ -323,58 +313,41 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.data.username = value
               })
             },
-            setPassword: (value) => {
-              set((state) => {
-                state.data.password = value
-              })
-            },
             saveConfig: async ({ url, username, password }: IServerConfig) => {
-              // try both token and password methods
-              for (const authType of [AuthType.TOKEN, AuthType.PASSWORD]) {
-                const token =
-                  authType === AuthType.TOKEN
-                    ? genPasswordToken(password)
-                    : genEncodedPassword(password)
-
-                const canConnect = await pingServer(
-                  url,
-                  username,
-                  token,
-                  authType,
-                )
-
-                const serverInfo = await queryServerInfo(url)
-
-                if (canConnect) {
-                  set((state) => {
-                    state.data.url = url
-                    state.data.username = username
-                    state.data.password = token
-                    state.data.authType = authType
-                    state.data.protocolVersion = serverInfo.protocolVersion
-                    state.data.serverType = serverInfo.serverType
-                    state.data.isServerConfigured = true
-                    state.data.extensionsSupported =
-                      serverInfo.extensionsSupported
-                  })
-                  return true
-                }
+              try {
+                const base = normalizeServerUrl(url)
+                const auth = await requestAt<{
+                  token: string
+                  user: { username: string; is_admin: boolean }
+                }>(base, '/api/auth/login', {
+                  method: 'POST',
+                  body: JSON.stringify({ username, password }),
+                })
+                set((state) => {
+                  state.data.url = base
+                  state.data.username = auth.user.username
+                  state.data.token = auth.token
+                  state.data.isAdmin = auth.user.is_admin
+                  state.data.serverType = 'supernova'
+                  state.data.isServerConfigured = true
+                })
+                return true
+              } catch {
+                return false
               }
-              set((state) => {
-                state.data.isServerConfigured = false
-              })
-              return false
             },
             removeConfig: () => {
+              void request('/api/auth/logout', { method: 'POST' }).catch(
+                () => {},
+              )
               set((state) => {
                 state.data.isServerConfigured = false
                 state.data.osType = ''
                 state.data.url = ''
                 state.data.username = ''
-                state.data.password = ''
-                state.data.authType = AuthType.TOKEN
-                state.data.protocolVersion = '1.16.0'
-                state.data.serverType = 'subsonic'
+                state.data.token = ''
+                state.data.isAdmin = false
+                state.data.serverType = 'supernova'
                 state.data.songCount = null
                 state.data.extensionsSupported = {}
                 state.pages.showInfoPanel = true
@@ -404,11 +377,11 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
           },
         })),
         {
-          name: 'app_store',
+          name: 'supernova_app_store',
         },
       ),
       {
-        name: 'app_store',
+        name: 'supernova_app_store',
         version: 1,
         merge: (persistedState, currentState) => {
           try {
@@ -460,39 +433,12 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
               enableImageCache = IMAGE_CACHE_ENABLED
             }
 
-            if (hasValidConfig) {
-              const newState = {
-                data: {
-                  isServerConfigured: true,
-                  url: SERVER_URL as string,
-                  username: genUser(),
-                  password: genPassword(),
-                  authType: getAuthType(),
-                  hideServer: HIDE_SERVER ?? false,
-                  serverType: SERVER_TYPE ?? 'subsonic',
-                  lockUser: true,
-                },
-                pages: {
-                  hidePlaylistsSection,
-                  hideRadiosSection,
-                  imagesCacheLayerEnabled: enableImageCache,
-                  lyricsCacheEnabled: enableLyricsCache,
-                  mediaCacheEnabled: enableMediaCache,
-                },
-              }
-
-              if (persistedState) {
-                return merge(currentState, persistedState, newState)
-              }
-
-              return merge(currentState, newState)
-            }
-
             const withoutLockUser = {
               data: {
                 lockUser: false,
               },
               pages: {
+                hideGenresSection: true,
                 hideArtistsSection,
                 hideSongsSection,
                 hideAlbumsSection,

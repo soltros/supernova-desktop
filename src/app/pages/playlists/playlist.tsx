@@ -11,7 +11,7 @@ import { PlaylistStickyHeader } from '@/app/components/playlist/sticky-header'
 import { DataTable } from '@/app/components/ui/data-table'
 import ErrorPage from '@/app/pages/error-page'
 import { songsColumns } from '@/app/tables/songs-columns'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlayerActions } from '@/store/player.store'
 import { ColumnFilter } from '@/types/columnFilter'
 import { convertSecondsToHumanRead } from '@/utils/convertSecondsToTime'
@@ -29,7 +29,7 @@ export default function Playlist() {
     isFetching,
   } = useQuery({
     queryKey: [queryKeys.playlist.single, playlistId],
-    queryFn: () => subsonic.playlists.getOne(playlistId),
+    queryFn: () => supernova.playlists.getOne(playlistId),
   })
 
   if (isFetching || isLoading) return <PlaylistFallback />

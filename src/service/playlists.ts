@@ -1,118 +1,104 @@
-import { httpClient } from '@/api/httpClient'
+import { request } from '@/api/httpClient'
 import {
-  CreateParams,
-  PlaylistsResponse,
-  PlaylistWithEntriesResponse,
-  SinglePlaylistResponse,
-  UpdateParams,
-} from '@/types/responses/playlist'
-import { SubsonicResponse } from '@/types/responses/subsonicResponse'
-
+  NativePlaylist,
+  NativeTrack,
+  playlistModel,
+  songModel,
+  unsupported,
+} from '@/api/models'
+import type { UpdateParams, CreateParams } from '@/types/responses/playlist'
 async function getAll() {
-  const response = await httpClient<PlaylistsResponse>('/getPlaylists', {
-    method: 'GET',
-  })
-
-  return response?.data.playlists.playlist ?? []
+  return ((await request<NativePlaylist[] | null>('/api/playlists')) || []).map(
+    playlistModel,
+  )
 }
-
 async function getOne(id: string) {
-  const response = await httpClient<PlaylistWithEntriesResponse>(
-    '/getPlaylist',
-    {
-      method: 'GET',
-      query: {
-        id,
-      },
-    },
-  )
-
-  return response?.data.playlist
+  const p = (await getAll()).find((p) => p.id === id)
+  if (!p) throw new Error('Playlist not found')
+  const tracks =
+    (await request<NativeTrack[] | null>(
+      `/api/playlists/${encodeURIComponent(id)}/tracks`,
+    )) || []
+  return {
+    ...p,
+    entry: tracks.map((t) => songModel(t)),
+    songCount: tracks.length,
+    duration: tracks.reduce((n, t) => n + t.duration_ms / 1000, 0),
+  }
 }
-
 async function remove(id: string) {
-  await httpClient<SubsonicResponse>('/deletePlaylist', {
+  await request(`/api/playlists/${encodeURIComponent(id)}`, {
     method: 'DELETE',
-    query: {
-      id,
-    },
   })
 }
-
-async function create(name: string, songs?: string[]) {
-  const query = new URLSearchParams()
-  query.append('name', name)
-
-  if (songs) {
-    songs.forEach((song) => query.append('songId', song))
+async function create(name: string, tracks: string[] = []) {
+  const p = await request<NativePlaylist>('/api/playlists', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  })
+  try {
+    for (const track_id of tracks)
+      await request(`/api/playlists/${encodeURIComponent(p.id)}/tracks`, {
+        method: 'POST',
+        body: JSON.stringify({ track_id }),
+      })
+  } catch (error) {
+    await remove(p.id)
+    throw error
   }
-
-  const response = await httpClient<SinglePlaylistResponse>(
-    `/createPlaylist?${query.toString()}`,
-    {
-      method: 'GET',
-    },
-  )
-
-  return response?.data.playlist
+  return playlistModel(p)
 }
-
 async function update({
   playlistId,
   name,
   comment,
+  isPublic,
   songIdToAdd,
   songIndexToRemove,
-  isPublic,
 }: UpdateParams) {
-  const query = new URLSearchParams({
-    playlistId,
-  })
-  if (name !== undefined) query.append('name', name)
-  if (comment !== undefined) query.append('comment', comment)
-  if (isPublic !== undefined) query.append('public', isPublic)
-
-  if (songIdToAdd) {
-    if (typeof songIdToAdd === 'string') {
-      query.append('songIdToAdd', songIdToAdd)
-    } else {
-      songIdToAdd.forEach((songId) => query.append('songIdToAdd', songId))
+  if (name !== undefined || comment || isPublic === 'true')
+    return unsupported('Playlist metadata editing and public playlists')
+  const path = `/api/playlists/${encodeURIComponent(playlistId)}/tracks`
+  const adds = songIdToAdd
+    ? Array.isArray(songIdToAdd)
+      ? songIdToAdd
+      : [songIdToAdd]
+    : []
+  const removes = songIndexToRemove
+    ? Array.isArray(songIndexToRemove)
+      ? songIndexToRemove
+      : [songIndexToRemove]
+    : []
+  if (removes.length) {
+    const p = await getOne(playlistId)
+    for (const index of removes) {
+      const t = p.entry[Number(index)]
+      if (!t) throw new Error('Playlist entry no longer exists')
+      if (p.entry.filter((s) => s.id === t.id).length > 1)
+        return unsupported('Removing an individual repeated playlist entry')
+      await request(`${path}/${encodeURIComponent(t.id)}`, { method: 'DELETE' })
     }
   }
-
-  if (songIndexToRemove) {
-    if (typeof songIndexToRemove === 'string') {
-      query.append('songIndexToRemove', songIndexToRemove)
-    } else {
-      songIndexToRemove.forEach((songIndex) =>
-        query.append('songIndexToRemove', songIndex),
-      )
-    }
-  }
-
-  await httpClient<SubsonicResponse>(`/updatePlaylist?${query.toString()}`, {
-    method: 'GET',
-  })
+  for (const track_id of adds)
+    await request(path, { method: 'POST', body: JSON.stringify({ track_id }) })
 }
-
-export async function createWithDetails(data: CreateParams) {
-  const playlist = await create(data.name)
-
-  if (playlist) {
-    await update({
-      playlistId: playlist.id,
-      comment: data.comment,
-      isPublic: data.isPublic,
-      songIdToAdd: data.songIdToAdd,
-    })
-  }
+async function createWithDetails(data: CreateParams) {
+  if (data.comment || data.isPublic === 'true')
+    return unsupported('Public playlists and comments')
+  return create(
+    data.name,
+    data.songIdToAdd
+      ? Array.isArray(data.songIdToAdd)
+        ? data.songIdToAdd
+        : [data.songIdToAdd]
+      : [],
+  )
 }
-
 export const playlists = {
   getAll,
   getOne,
   remove,
   create,
-  createWithDetails,
   update,
+  createWithDetails,
 }

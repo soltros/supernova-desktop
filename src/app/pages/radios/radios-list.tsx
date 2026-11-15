@@ -13,7 +13,7 @@ import { RemoveRadioDialog } from '@/app/components/radios/remove-dialog'
 import { Button } from '@/app/components/ui/button'
 import { DataTable } from '@/app/components/ui/data-table'
 import { radiosColumns } from '@/app/tables/radios-columns'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { usePlayerActions } from '@/store/player.store'
 import { useRadios } from '@/store/radios.store'
 import { Radio } from '@/types/responses/radios'
@@ -26,7 +26,7 @@ export default function Radios() {
 
   const { data: radios, isLoading } = useQuery({
     queryKey: [queryKeys.radio.all],
-    queryFn: subsonic.radios.getAll,
+    queryFn: supernova.radios.getAll,
   })
 
   const columns = radiosColumns()

@@ -9,7 +9,7 @@ import ListWrapper from '@/app/components/list-wrapper'
 import { DataTable } from '@/app/components/ui/data-table'
 import { genresColumns } from '@/app/tables/genres-columns'
 import { ROUTES } from '@/routes/routesList'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { queryKeys } from '@/utils/queryKeys'
 
 const MemoShadowHeader = memo(ShadowHeader)
@@ -23,7 +23,7 @@ export default function GenresList() {
 
   const { data: genres, isLoading } = useQuery({
     queryKey: [queryKeys.genre.all],
-    queryFn: subsonic.genres.get,
+    queryFn: supernova.genres.get,
   })
 
   if (isLoading) return <SongListFallback />

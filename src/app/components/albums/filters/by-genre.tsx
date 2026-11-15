@@ -19,7 +19,7 @@ import {
 } from '@/app/components/ui/popover'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { AlbumsSearchParams } from '@/utils/albumsFilter'
 import { queryKeys } from '@/utils/queryKeys'
 import { scrollPageToTop } from '@/utils/scrollPageToTop'
@@ -33,7 +33,7 @@ export function AlbumsFilterByGenre() {
 
   const { data: genres, isLoading } = useQuery({
     queryKey: [queryKeys.genre],
-    queryFn: subsonic.genres.get,
+    queryFn: supernova.genres.get,
   })
 
   const genre = getSearchParam<string>(AlbumsSearchParams.Genre, '')

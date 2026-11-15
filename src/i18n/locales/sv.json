@@ -275,7 +275,7 @@
   "login": {
     "form": {
       "server": "Server",
-      "description": "Anslut till din Subsonic-server.",
+      "description": "Anslut till din Supernova-server.",
       "url": "URL",
       "urlDescription": "Detta är din server-URL",
       "username": "Användarnamn",
@@ -416,7 +416,7 @@
     "incompatible": {
       "title": "Inkompatibel server",
       "skip": "Fortsätt ändå",
-      "description": "Den här servern använder en äldre version av Subsonic-protokollet som inte stöds fullt ut. Fortsätt med försiktighet eftersom det kan uppstå problem."
+      "description": "Den här servern använder en äldre version av Supernova-protokollet som inte stöds fullt ut. Fortsätt med försiktighet eftersom det kan uppstå problem."
     },
     "buttons": {
       "refresh": "Uppdatera status",

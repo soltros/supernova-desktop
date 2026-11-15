@@ -43,7 +43,7 @@ export function setupEvents(window: BrowserWindow | null) {
   })
 
   window.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    if (/^https?:\/\//i.test(details.url)) void shell.openExternal(details.url)
     return { action: 'deny' }
   })
 

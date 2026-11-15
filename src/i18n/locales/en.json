@@ -385,7 +385,7 @@
   "login": {
     "form": {
       "server": "Server",
-      "description": "Connect to your Subsonic server.",
+      "description": "Connect to your Supernova server.",
       "url": "URL",
       "urlDescription": "This is your server URL",
       "username": "Username",
@@ -540,7 +540,7 @@
     "management": "Server management",
     "incompatible": {
       "title": "Incompatible server",
-      "description": "This server uses an older version of the Subsonic protocol that is not fully supported. Please proceed with caution as you may have issues.",
+      "description": "This server uses an older version of the Supernova protocol that is not fully supported. Please proceed with caution as you may have issues.",
       "skip": "Continue anyway"
     },
     "buttons": {

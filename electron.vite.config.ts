@@ -30,6 +30,7 @@ export default defineConfig({
         input: {
           index: resolve(__dirname, 'electron/preload/index.ts'),
         },
+        output: { format: 'cjs', entryFileNames: 'index.cjs' },
       },
       externalizeDeps: {
         exclude: ['@electron-toolkit/preload', 'electron-updater'],

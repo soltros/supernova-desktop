@@ -395,7 +395,7 @@
       "connecting": "Łączenie…",
       "url": "URL",
       "usernamePlaceholder": "Twoja nazwa użytkownika",
-      "description": "Połącz się do twojego serwera Subsonic.",
+      "description": "Połącz się do twojego serwera Supernova.",
       "username": "Nazwa użytkownika"
     }
   },
@@ -537,7 +537,7 @@
     "incompatible": {
       "skip": "Kontynuuj mimo wszystko",
       "title": "Niekompatybilny serwer",
-      "description": "Ten serwer wykorzystuje starszą wersję protokołu Subsonic która nie jest w pełni wspierana. Postępuj z uwagą, bo mogą wystąpić problemy."
+      "description": "Ten serwer wykorzystuje starszą wersję protokołu Supernova która nie jest w pełni wspierana. Postępuj z uwagą, bo mogą wystąpić problemy."
     },
     "buttons": {
       "refresh": "Odśwież status",

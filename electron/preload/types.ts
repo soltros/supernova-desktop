@@ -57,7 +57,13 @@ export type PlayerStateListenerActions =
   | 'toggleShuffle'
   | 'toggleRepeat'
 
-export interface ISupernova DesktopAPI {
+export interface ISupernovaAPI {
+  supernovaRequest?: (payload: {
+    url: string
+    method: string
+    token?: string
+    body?: string
+  }) => Promise<{ status: number; body: string }>
   enterFullScreen: () => void
   exitFullScreen: () => void
   isFullScreen: () => Promise<boolean>

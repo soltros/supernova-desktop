@@ -9,7 +9,7 @@ import {
   MainSidebarMenu,
 } from '@/app/components/ui/main-sidebar'
 import { ScrollArea } from '@/app/components/ui/scroll-area'
-import { subsonic } from '@/service/subsonic'
+import { supernova } from '@/service/supernova'
 import { useAppStore } from '@/store/app.store'
 import { queryKeys } from '@/utils/queryKeys'
 import { SidebarPlaylistItem } from './playlist-item'
@@ -20,7 +20,7 @@ export function NavPlaylists() {
 
   const { data: playlists } = useQuery({
     queryKey: [queryKeys.playlist.all],
-    queryFn: subsonic.playlists.getAll,
+    queryFn: supernova.playlists.getAll,
   })
 
   if (hidePlaylistsSection) return null

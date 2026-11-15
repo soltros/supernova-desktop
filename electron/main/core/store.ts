@@ -1,6 +1,6 @@
 import Store, { type Options } from 'electron-store'
 
-export class Supernova DesktopStore<
+export class SupernovaStore<
   // biome-ignore lint/suspicious/noExplicitAny: generic record
   T extends Record<string, any> = Record<string, unknown>,
 > extends Store<T> {

@@ -302,7 +302,7 @@
         "password": "Renseignez un mot de passe",
         "passwordLength": "Le mot de passe doit comporter au moins 2 caractères."
       },
-      "description": "Connexion à votre serveur Subsonic."
+      "description": "Connexion à votre serveur Supernova."
     }
   },
   "fullscreen": {
@@ -593,7 +593,7 @@
     "incompatible": {
       "title": "Serveur incompatible",
       "skip": "Continuer quand même",
-      "description": "Ce serveur utilise une ancienne version du protocole Subsonic qui n'est pas entièrement prise en charge. Procédez avec prudence, car vous pourriez rencontrer des problèmes."
+      "description": "Ce serveur utilise une ancienne version du protocole Supernova qui n'est pas entièrement prise en charge. Procédez avec prudence, car vous pourriez rencontrer des problèmes."
     },
     "folderCount_one": "{{count}} dossier",
     "folderCount_many": "{{count}} dossiers",

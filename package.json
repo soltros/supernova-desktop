@@ -11,17 +11,17 @@
   "productName": "Supernova Desktop",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "lint": "biome lint",
     "lint:fix": "biome lint --write",
     "lint:check": "biome check --write",
     "lint:format": "biome format --write",
     "cy:open": "cypress open",
-    "test": "cypress run --component",
+    "test": "vitest run",
     "electron:start": "electron-vite preview",
     "electron:dev": "electron-vite dev --watch",
-    "electron:build": "electron-vite build",
+    "electron:build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "electron-builder --dir",
     "build:win": "electron-builder --win",
@@ -30,7 +30,9 @@
     "ci:build:win": "electron-builder --win --publish always",
     "ci:build:mac": "electron-builder --mac --publish always",
     "ci:build:linux": "electron-builder --linux --publish always",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test:components": "cypress run --component"
   },
   "repository": {
     "type": "git",
@@ -69,7 +71,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "discord-rpc": "^4.0.1",
     "electron-dl": "^4.0.0",
@@ -119,7 +120,6 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
     "@electron-toolkit/tsconfig": "^1.0.1",
-    "@types/crypto-js": "^4.2.2",
     "@types/discord-rpc": "4.0.1",
     "@types/html-to-text": "^9.0.4",
     "@types/linkify-it": "^5.0.0",
@@ -135,12 +135,15 @@
     "electron": "^42.6.1",
     "electron-builder": "^26.4.0",
     "electron-vite": "^5.0.0",
+    "fake-indexeddb": "6.2.4",
     "husky": "^9.1.7",
+    "jsdom": "30.1.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.19",
     "terser": "^5.39.0",
     "typescript": "^5.8.2",
-    "vite": "^7.3.6"
+    "vite": "^7.3.6",
+    "vitest": "5.1.0"
   },
   "packageManager": "pnpm@11.9.0",
   "electron": {
