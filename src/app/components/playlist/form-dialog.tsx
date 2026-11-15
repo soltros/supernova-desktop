@@ -171,6 +171,7 @@ export function CreatePlaylistDialog() {
                     <FormControl>
                       <Textarea
                         {...field}
+                        disabled
                         placeholder={t(
                           'playlist.form.labels.commentDescription',
                         )}
@@ -199,6 +200,7 @@ export function CreatePlaylistDialog() {
                     <FormControl>
                       <Switch
                         id="playlist-is-public"
+                        disabled
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         className="ml-4"

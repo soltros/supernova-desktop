@@ -55,7 +55,9 @@ async function getTopSongs(name: string) {
       ).map((t) => songModel(t))
     : []
 }
+async function getArtistSongs(id:string){return (await pages<NativeTrack>('/api/tracks',{artist_id:id})).map(t=>songModel(t))}
 export const songs = {
+  getArtistSongs,
   getAllSongs,
   getSong,
   getRandomSongs,

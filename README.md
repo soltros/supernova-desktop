@@ -2,7 +2,7 @@
 
 An independent desktop client for [Supernova Music](https://github.com/soltros/Supernova), built from the Aonsoku React/Electron interface.
 
-This hard fork is migrating to Supernova’s native REST API, bearer sessions, and resource-scoped media tickets. It does not support Subsonic servers.
+This hard fork uses Supernova’s native REST API, bearer sessions, and resource-scoped media tickets. It does not support Subsonic servers.
 
 ## Development
 

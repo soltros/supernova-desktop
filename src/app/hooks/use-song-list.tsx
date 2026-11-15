@@ -1,30 +1,12 @@
 import { supernova } from '@/service/supernova'
 
 export function useSongList() {
-  async function getArtistSongCount(id: string) {
-    const response = await supernova.artists.getOne(id)
-    let count = 0
-
-    if (!response || !response.album) return count
-
-    response.album.forEach((item) => {
-      count += item.songCount
-    })
-
-    return count
+  async function getArtistSongCount(id:string) {
+    return (await supernova.songs.getArtistSongs(id)).length
   }
-
-  async function getArtistAllSongs(name: string) {
-    const response = await supernova.search.get({
-      query: name,
-      songCount: 9999999,
-      albumCount: 0,
-      artistCount: 0,
-    })
-
-    if (!response || !response.song) return undefined
-
-    return response.song
+  async function getArtistAllSongs(name:string) {
+    const artist=(await supernova.artists.getAll()).find(a=>a.name===name)
+    return artist?supernova.songs.getArtistSongs(artist.id):[]
   }
 
   async function getAlbumSongs(albumId: string) {
