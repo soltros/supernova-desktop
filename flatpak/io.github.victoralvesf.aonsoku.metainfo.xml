@@ -5,7 +5,7 @@
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
 
-  <name>Aonsoku</name>
+  <name>Supernova Desktop</name>
   <summary>A modern desktop client for Navidrome/Subsonic servers</summary>
 
   <developer id="io.github.victoralves">
@@ -14,12 +14,12 @@
 
   <description>
     <ul>
-      <li><em>Subsonic Integration:</em> Aonsoku integrates with your Navidrome or Subsonic server, providing you with easy access to your music collection.</li>
+      <li><em>Subsonic Integration:</em> Supernova Desktop integrates with your Navidrome or Subsonic server, providing you with easy access to your music collection.</li>
       <li><em>Intuitive UI:</em> Modern, clean and user-friendly interface designed to enhance your music listening experience.</li>
-      <li><em>Podcast Support:</em> With Aonsoku Podcasts you can easily access, manage, and listen to your favorites podcasts directly within the app. Enjoy advanced search options, customizable filters and seamless listening synchronization to enhance your podcast experience.</li>
-      <li><em>Synchronized lyrics:</em> Aonsoku will automatically find a synced lyric from LRCLIB if none is provided by the server.</li>
-      <li><em>Unsynchronized lyrics:</em> If your songs have embedded unsynchronized lyrics, Aonsoku is able to show them.</li>
-      <li><em>Radio:</em> If your server supports it, listen to radio shows directly within Aonsoku.</li>
+      <li><em>Podcast Support:</em> With Supernova Desktop Podcasts you can easily access, manage, and listen to your favorites podcasts directly within the app. Enjoy advanced search options, customizable filters and seamless listening synchronization to enhance your podcast experience.</li>
+      <li><em>Synchronized lyrics:</em> Supernova Desktop will automatically find a synced lyric from LRCLIB if none is provided by the server.</li>
+      <li><em>Unsynchronized lyrics:</em> If your songs have embedded unsynchronized lyrics, Supernova Desktop is able to show them.</li>
+      <li><em>Radio:</em> If your server supports it, listen to radio shows directly within Supernova Desktop.</li>
       <li><em>Scrobble:</em> Sync played songs with your server.</li>
     </ul>
   </description>
@@ -29,7 +29,7 @@
   <content_rating type="oars-1.1" />
 
   <url type="homepage">https://aonsoku.vercel.app</url>
-  <url type="vcs-browser">https://github.com/victoralvesf/aonsoku</url>
+  <url type="vcs-browser">https://github.com/soltros/supernova-desktop</url>
 
   <screenshots>
     <screenshot type="default">
@@ -48,7 +48,7 @@
 
   <releases>
     <release version="0.15.0" date="2026-07-12">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.15.0</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.15.0</url>
       <description>
         <p>New Features</p>
         <ul>
@@ -74,7 +74,7 @@
       </description>
     </release>
     <release version="0.14.0" date="2026-04-02">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.14.0</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.14.0</url>
       <description>
         <p>New Features</p>
         <ul>
@@ -94,7 +94,7 @@
       </description>
     </release>
     <release version="0.13.0" date="2026-02-26">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.13.0</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.13.0</url>
       <description>
         <p>New Features</p>
         <ul>
@@ -111,7 +111,7 @@
       </description>
     </release>
     <release version="0.12.0" date="2026-02-18">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.12.0</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.12.0</url>
       <description>
         <p>New Features</p>
         <ul>
@@ -130,7 +130,7 @@
       </description>
     </release>
     <release version="0.11.0" date="2026-01-31">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.11.0</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.11.0</url>
       <description>
         <p>New Features</p>
         <ul>
@@ -158,7 +158,7 @@
       </description>
     </release>
     <release version="0.10.2" date="2025-12-14">
-      <url type="details">https://github.com/victoralvesf/aonsoku/releases/tag/v0.10.2</url>
+      <url type="details">https://github.com/soltros/supernova-desktop/releases/tag/v0.10.2</url>
       <description>
         <p>New Features</p>
         <ul>

@@ -662,7 +662,7 @@
     "privacy": {
       "services": {
         "group": "Ulkoiset palvelut",
-        "description": "Hallinnoi ulkoisia palveluita joita Aonsoku voi käyttää.",
+        "description": "Hallinnoi ulkoisia palveluita joita Supernova Desktop voi käyttää.",
         "lrclib": {
           "info": "LRCLIB -palvelua käytetään sanoitusten hakuun.",
           "label": "LRCLIB",
@@ -716,7 +716,7 @@
       },
       "podcast": {
         "group": "Podcastit",
-        "description": "Ota käyttöön Aonsoku Podcasts -palvelun integrointi.",
+        "description": "Ota käyttöön Supernova Desktop Podcasts -palvelun integrointi.",
         "enabled": {
           "label": "Ota integrointi käyttöön"
         },

@@ -34,7 +34,7 @@ const icons = {
     icon: <ListMusic />,
   },
   CreatePlaylist: {
-    className: 'from-teal-400 to-emerald-600',
+    className: 'from-teal-400 to-purple-600',
     icon: <PlusIcon />,
   },
   ServerManagement: {

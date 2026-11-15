@@ -680,7 +680,7 @@
     "privacy": {
       "services": {
         "group": "Externi Dienst",
-        "description": "Leit fest weli Dienst Aonsoku verwende chan.",
+        "description": "Leit fest weli Dienst Supernova Desktop verwende chan.",
         "lrclib": {
           "info": "LRCLIB wird brucht zum Liedtext z'finde.",
           "label": "LRCLIB",
@@ -730,7 +730,7 @@
       },
       "podcast": {
         "group": "Podcasts",
-        "description": "Aktivier d'Integration mitem Aonsoku Podcasts Dienst.",
+        "description": "Aktivier d'Integration mitem Supernova Desktop Podcasts Dienst.",
         "enabled": {
           "label": "Integration aktiviere"
         },

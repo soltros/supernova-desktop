@@ -5,7 +5,7 @@ import {
   screen,
 } from 'electron'
 import { electron } from '../../../package.json'
-import { AonsokuStore } from './store'
+import { Supernova DesktopStore } from './store'
 
 interface ExtraOptions {
   /** Should we automatically maximize the window, if it was last closed maximized. Defaults to `true`. */
@@ -28,7 +28,7 @@ interface State {
 
 const { defaultWidth, defaultHeight } = electron.window
 
-const windowStore = new AonsokuStore<State>({
+const windowStore = new Supernova DesktopStore<State>({
   name: 'window',
   defaults: {
     width: defaultWidth,

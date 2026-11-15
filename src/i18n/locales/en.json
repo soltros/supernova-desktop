@@ -684,7 +684,7 @@
     "privacy": {
       "services": {
         "group": "External Services",
-        "description": "Manage the external services that Aonsoku can access.",
+        "description": "Manage the external services that Supernova Desktop can access.",
         "lrclib": {
           "info": "LRCLIB is used to find song lyrics.",
           "label": "LRCLIB",
@@ -738,7 +738,7 @@
       },
       "podcast": {
         "group": "Podcasts",
-        "description": "Enable integration with the Aonsoku Podcasts service.",
+        "description": "Enable integration with the Supernova Desktop Podcasts service.",
         "enabled": {
           "label": "Enable Integration"
         },

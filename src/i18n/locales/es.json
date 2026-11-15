@@ -706,7 +706,7 @@
           "error": "Se requiere el Nombre de Usuario y la URL del Servidor.",
           "label": "Usa un Usuario con Sesión Iniciada y la URL del Servidor"
         },
-        "description": "Activar integracion con el servicio Aonsoku Podcasts.",
+        "description": "Activar integracion con el servicio Supernova Desktop Podcasts.",
         "enabled": {
           "label": "Activar integración"
         },
@@ -780,7 +780,7 @@
             "example": "Ejemplo: https://my-lrclib.com"
           }
         },
-        "description": "Organiza los servicios externos a los que Aonsoku puede acceder.",
+        "description": "Organiza los servicios externos a los que Supernova Desktop puede acceder.",
         "animatedCover": {
           "enabled": {
             "label": "Habilita coberturas animadas",

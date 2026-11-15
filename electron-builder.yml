@@ -1,5 +1,5 @@
-appId: com.victoralvesf.aonsoku
-productName: Aonsoku
+appId: com.soltros.supernova.desktop
+productName: Supernova Desktop
 copyright: Copyright © 2026 Victor Alves
 icon: ./build/icon.ico
 artifactName: '${productName}-v${version}-${os}-${arch}.${ext}'
@@ -18,7 +18,7 @@ extraResources:
     to: resources
 
 win:
-  executableName: Aonsoku
+  executableName: Supernova Desktop
   target:
     - target: nsis
       arch:
@@ -57,14 +57,14 @@ linux:
         - x64
         - arm64
     - deb
-  maintainer: victoralvesf
+  maintainer: soltros
   category: AudioVideo
-  synopsis: 'A modern desktop music client for Navidrome and OpenSubsonic servers.'
+  synopsis: 'Desktop music client for Supernova servers.'
 
 npmRebuild: true
 nativeRebuilder: legacy
 
 publish:
   provider: github
-  owner: victoralvesf
-  repo: aonsoku
+  owner: soltros
+  repo: supernova-desktop

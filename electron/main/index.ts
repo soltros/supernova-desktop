@@ -32,7 +32,7 @@ if (!instanceLock) {
   })
 
   app.whenReady().then(() => {
-    electronApp.setAppUserModelId('com.victoralvesf.aonsoku')
+    electronApp.setAppUserModelId('com.soltros.supernova.desktop')
 
     initAutoUpdater()
     createWindow()

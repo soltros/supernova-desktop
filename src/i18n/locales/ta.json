@@ -681,7 +681,7 @@
     "privacy": {
       "services": {
         "group": "வெளி சேவைகள்",
-        "description": "Aonsoku அணுகக்கூடிய வெளிப்புற சேவைகளை நிர்வகிக்கவும்.",
+        "description": "Supernova Desktop அணுகக்கூடிய வெளிப்புற சேவைகளை நிர்வகிக்கவும்.",
         "lrclib": {
           "info": "பாடல் வரிகளைக் கண்டறிய LRCLIB பயன்படுகிறது.",
           "label": "LRCLIB",
@@ -735,7 +735,7 @@
       },
       "podcast": {
         "group": "பாட்காச்ட்கள்",
-        "description": "Aonsoku Podcasts சேவையுடன் ஒருங்கிணைப்பை இயக்கவும்.",
+        "description": "Supernova Desktop Podcasts சேவையுடன் ஒருங்கிணைப்பை இயக்கவும்.",
         "enabled": {
           "label": "ஒருங்கிணைப்பை இயக்கு"
         },

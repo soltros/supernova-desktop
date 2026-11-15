@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Comment=A modern desktop client for Navidrome/Subsonic servers.
-Name=Aonsoku
+Name=Supernova Desktop
 Exec=aonsoku.sh
 Icon=io.github.victoralvesf.aonsoku
 Categories=Audio;

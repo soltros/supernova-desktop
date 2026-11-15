@@ -684,7 +684,7 @@
     "privacy": {
       "services": {
         "group": "Külső szolgáltatások",
-        "description": "Kezeld azokat a külső szolgáltatásokat, amelyekhez az Aonsoku hozzáférhet.",
+        "description": "Kezeld azokat a külső szolgáltatásokat, amelyekhez az Supernova Desktop hozzáférhet.",
         "lrclib": {
           "info": "Az LRCLIB segít a dalszövegeket megtalálni.",
           "label": "LRCLIB",
@@ -738,7 +738,7 @@
       },
       "podcast": {
         "group": "Podcastek",
-        "description": "Engedélyezd az integrációt az Aonsoku Podcast szolgáltatással.",
+        "description": "Engedélyezd az integrációt az Supernova Desktop Podcast szolgáltatással.",
         "enabled": {
           "label": "Integráció engedélyezése"
         },

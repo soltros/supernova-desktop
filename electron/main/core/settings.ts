@@ -1,10 +1,10 @@
-import { AonsokuStore } from './store'
+import { Supernova DesktopStore } from './store'
 
 export interface ISettingPayload {
   minimizeToTray: boolean
 }
 
-const settingsStore = new AonsokuStore<ISettingPayload>({
+const settingsStore = new Supernova DesktopStore<ISettingPayload>({
   name: 'settings',
   defaults: {
     minimizeToTray: false,
