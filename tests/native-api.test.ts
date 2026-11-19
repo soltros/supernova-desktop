@@ -1,3 +1,4 @@
+import { Capacitor, CapacitorHttp } from '@capacitor/core'
 import { invalidateFavorites } from '@/api/favorites'
 import { beforeEach, afterEach, it, expect, vi } from 'vitest'
 import { useAppStore } from '@/store/app.store'
@@ -6,9 +7,15 @@ import {
   getDownloadUrl,
   normalizeServerUrl,
   request,
+  requestAt,
 } from '@/api/httpClient'
 import { supernova } from '@/service/supernova'
 import { podcasts } from '@/service/podcasts'
+vi.mock('@capacitor/core', () => ({
+  Capacitor: { isNativePlatform: () => false },
+  CapacitorHttp: { request: vi.fn() },
+}))
+
 const fetchMock = vi.fn()
 const track = {
   id: 'track-1',
@@ -46,6 +53,7 @@ beforeEach(() => {
   })
 })
 afterEach(() => {
+  vi.restoreAllMocks()
   vi.unstubAllGlobals()
   delete (window as any).api
 })
@@ -95,6 +103,28 @@ it('requests scoped media tickets and never exposes bearer credentials in URLs',
   expect(JSON.parse(fetchMock.mock.calls[1][1].body).scope).toBe(
     'download-album',
   )
+})
+it('uses native HTTPS for mobile API calls and preserves empty arrays', async () => {
+  vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true)
+  const nativeRequest = vi.spyOn(CapacitorHttp, 'request').mockResolvedValue({
+    status: 200,
+    data: [],
+    headers: {},
+    url: 'https://music.example/api/albums',
+  })
+  await expect(request('/api/albums')).resolves.toEqual([])
+  expect(nativeRequest).toHaveBeenCalledWith(
+    expect.objectContaining({
+      url: 'https://music.example/api/albums',
+      headers: { authorization: 'Bearer account-secret' },
+      disableRedirects: true,
+    }),
+  )
+  await expect(
+    requestAt('http://music.example', '/api/albums'),
+  ).rejects.toThrow('HTTPS')
+  expect(nativeRequest).toHaveBeenCalledTimes(1)
+  expect(fetchMock).not.toHaveBeenCalled()
 })
 it('paginates beyond 1000 native tracks and converts milliseconds to seconds', async () => {
   fetchMock.mockImplementation((url: URL) => {

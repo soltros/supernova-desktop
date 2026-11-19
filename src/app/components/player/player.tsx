@@ -21,12 +21,14 @@ import { ensureSupportForAlac } from '@/utils/alac'
 import { hasPiPSupport } from '@/utils/browser'
 import { logger } from '@/utils/logger'
 import { ReplayGainParams } from '@/utils/replayGain'
+import { manageMediaSession } from '@/utils/setMediaSession'
 import { AudioPlayer } from './audio'
 import { PlayerClearQueueButton } from './clear-queue-button'
 import { PlayerControls } from './controls'
 import { PlayerExpandButton } from './expand-button'
 import { PlayerLikeButton } from './like-button'
 import { PlayerLyricsButton } from './lyrics-button'
+import { MobilePlayer } from './mobile-player'
 import { PodcastInfo } from './podcast-info'
 import { PodcastPlaybackRate } from './podcast-playback-rate'
 import { PlayerProgress } from './progress'
@@ -47,7 +49,7 @@ const MemoPodcastPlaybackRate = memo(PodcastPlaybackRate)
 const MemoLyricsButton = memo(PlayerLyricsButton)
 const MemoMiniPlayerButton = memo(MiniPlayerButton)
 
-export function Player() {
+export function Player({ mobile = false }: { mobile?: boolean }) {
   const hideFavoritesSection = useAppStore().pages.hideFavoritesSection
   const audioRef = useRef<HTMLAudioElement>(null)
   const radioRef = useRef<HTMLAudioElement>(null)
@@ -76,18 +78,15 @@ export function Player() {
 
   const songId = song?.id
 
-  const [songStreamUrl, setSongStreamUrl] = useState('')
+  const [songStream, setSongStream] = useState<{ id: string; url: string }>()
+  const songStreamUrl = songStream?.id === songId ? songStream?.url : undefined
   useEffect(() => {
     let active = true
-    setSongStreamUrl('')
+    setSongStream(undefined)
     if (songId)
-      void getSongStreamUrl(
-        songId,
-        undefined,
-        ensureSupportForAlac(song.suffix),
-      )
+      getSongStreamUrl(songId, undefined, ensureSupportForAlac(song.suffix))
         .then((url) => {
-          if (active) setSongStreamUrl(url)
+          if (active) setSongStream({ id: songId, url })
         })
         .catch(() => {
           if (active) setPlayingState(false)
@@ -104,6 +103,21 @@ export function Player() {
     return audioRef
   }, [isPodcast, isRadio])
 
+  useEffect(() => {
+    if (!mobile) return
+    if (isPodcast) {
+      manageMediaSession.setPodcastHandlers({
+        handleSeekAction: (seconds) => {
+          const audio = podcastRef.current
+          if (audio) audio.currentTime += seconds
+        },
+      })
+    } else {
+      manageMediaSession.setHandlers()
+    }
+  }, [isPodcast, mobile])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: React mounts a new media element when the source changes.
   useEffect(() => {
     const node = getAudioRef().current
     setAudioPlayerRef(node)
@@ -229,59 +243,70 @@ export function Player() {
   }, [song, replayGainDefaultGain, replayGainPreAmp, replayGainType])
 
   return (
-    <footer className="border-t h-[--player-height] w-full flex items-center fixed bottom-0 left-0 right-0 z-40 bg-background">
-      <div className="w-full h-full grid grid-cols-player gap-2 px-4">
-        {/* Track Info */}
-        <div className="flex items-center gap-2 w-full">
-          {isSong && <MemoTrackInfo song={song} />}
-          {isRadio && <MemoRadioInfo radio={radio} />}
-          {isPodcast && <MemoPodcastInfo podcast={podcast} />}
-        </div>
-        {/* Main Controls */}
-        <div className="col-span-2 flex flex-col justify-center items-center px-4 gap-1">
-          <MemoPlayerControls
-            song={song}
-            radio={radio}
-            podcast={podcast}
-            audioRef={getAudioRef()}
-          />
-
-          {(isSong || isPodcast) && (
-            <MemoPlayerProgress audioRef={getAudioRef()} />
-          )}
-        </div>
-        {/* Remain Controls and Volume */}
-        <div className="flex items-center w-full justify-end">
-          <div className="flex items-center gap-1">
-            {isSong && !hideFavoritesSection && (
-              <>
-                <MemoPlayerLikeButton disabled={!song} />
-              </>
-            )}
-            {isSong && (
-              <>
-                <MemoLyricsButton disabled={!song} />
-                <MemoPlayerQueueButton disabled={!song} />
-              </>
-            )}
-            {isPodcast && <MemoPodcastPlaybackRate />}
-            {(isRadio || isPodcast) && (
-              <MemoPlayerClearQueueButton disabled={!radio && !podcast} />
-            )}
-
-            <MemoPlayerVolume
+    <footer
+      className={
+        mobile
+          ? 'shrink-0'
+          : 'border-t h-[--player-height] w-full flex items-center fixed bottom-0 left-0 right-0 z-40 bg-background'
+      }
+    >
+      {mobile ? (
+        <MobilePlayer />
+      ) : (
+        <div className="w-full h-full grid grid-cols-player gap-2 px-4">
+          {/* Track Info */}
+          <div className="flex items-center gap-2 w-full">
+            {isSong && <MemoTrackInfo song={song} />}
+            {isRadio && <MemoRadioInfo radio={radio} />}
+            {isPodcast && <MemoPodcastInfo podcast={podcast} />}
+          </div>
+          {/* Main Controls */}
+          <div className="col-span-2 flex flex-col justify-center items-center px-4 gap-1">
+            <MemoPlayerControls
+              song={song}
+              radio={radio}
+              podcast={podcast}
               audioRef={getAudioRef()}
-              disabled={!song && !radio && !podcast}
             />
 
-            {isSong && <MemoPlayerExpandButton disabled={!song} />}
-            {isSong && hasPiPSupport && <MemoMiniPlayerButton />}
+            {(isSong || isPodcast) && (
+              <MemoPlayerProgress audioRef={getAudioRef()} />
+            )}
+          </div>
+          {/* Remain Controls and Volume */}
+          <div className="flex items-center w-full justify-end">
+            <div className="flex items-center gap-1">
+              {isSong && !hideFavoritesSection && (
+                <>
+                  <MemoPlayerLikeButton disabled={!song} />
+                </>
+              )}
+              {isSong && (
+                <>
+                  <MemoLyricsButton disabled={!song} />
+                  <MemoPlayerQueueButton disabled={!song} />
+                </>
+              )}
+              {isPodcast && <MemoPodcastPlaybackRate />}
+              {(isRadio || isPodcast) && (
+                <MemoPlayerClearQueueButton disabled={!radio && !podcast} />
+              )}
+
+              <MemoPlayerVolume
+                audioRef={getAudioRef()}
+                disabled={!song && !radio && !podcast}
+              />
+
+              {isSong && <MemoPlayerExpandButton disabled={!song} />}
+              {isSong && hasPiPSupport && <MemoMiniPlayerButton />}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {isSong && song && songStreamUrl && (
         <AudioPlayer
+          key={songStreamUrl}
           replayGain={trackReplayGain}
           src={songStreamUrl}
           autoPlay={isPlaying}
@@ -299,6 +324,7 @@ export function Player() {
 
       {isRadio && radio && (
         <AudioPlayer
+          key={radio.id}
           src={radio.streamUrl}
           autoPlay={isPlaying}
           audioRef={radioRef}
@@ -311,6 +337,7 @@ export function Player() {
 
       {isPodcast && podcast && (
         <AudioPlayer
+          key={podcast.id}
           src={getProxyURL(podcast.audio_url)}
           autoPlay={isPlaying}
           audioRef={podcastRef}

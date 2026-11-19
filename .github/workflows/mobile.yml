@@ -1,0 +1,76 @@
+name: Build Mobile
+
+on:
+  push:
+    branches: [mobile/capacitor]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+          - platform: ios
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      CYPRESS_INSTALL_BINARY: '0'
+      HUSKY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm build
+      - name: Set up Android JDK
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Generate native project
+        run: pnpm exec cap add ${{ matrix.platform }}
+      - name: Build Android APK
+        if: matrix.platform == 'android'
+        working-directory: android
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Build unsigned iPhone IPA
+        if: matrix.platform == 'ios'
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare-ios.py
+          xcodebuild -project ios/App/App.xcodeproj -scheme App \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/supernova-ios" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$RUNNER_TEMP/supernova-ios/Build/Products/Release-iphoneos/App.app" "$RUNNER_TEMP/ipa/Payload/"
+          cd "$RUNNER_TEMP/ipa"
+          zip -qry Supernova-unsigned.ipa Payload
+      - name: Upload Android APK
+        if: matrix.platform == 'android'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Supernova-Android
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload unsigned iPhone IPA
+        if: matrix.platform == 'ios'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Supernova-iOS
+          path: ${{ runner.temp }}/ipa/Supernova-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7

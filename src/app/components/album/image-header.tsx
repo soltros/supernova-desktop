@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import clsx from 'clsx'
 import { useState } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -59,7 +60,7 @@ export default function ImageHeader({
       {(src, isLoading) => (
         <div
           id="image-header-container"
-          className="flex relative w-full h-[calc(3rem+200px)] 2xl:h-[calc(3rem+250px)]"
+          className="flex relative w-full min-h-44 md:h-[calc(3rem+200px)] 2xl:h-[calc(3rem+250px)]"
           key={`header-${coverArtId}`}
         >
           {isLoading && (
@@ -69,14 +70,14 @@ export default function ImageHeader({
           )}
           <div
             className={cn(
-              'w-full px-8 py-6 flex gap-4 absolute inset-0',
+              'flex w-full items-center gap-3 px-4 py-5 md:absolute md:inset-0 md:items-stretch md:gap-4 md:px-8 md:py-6',
               'bg-gradient-to-b from-background/20 to-background/50',
             )}
             style={{ backgroundColor: bgColor }}
           >
             <div
               className={cn(
-                'w-[200px] h-[200px] min-w-[200px] min-h-[200px]',
+                'size-28 shrink-0 md:size-[200px]',
                 '2xl:w-[250px] 2xl:h-[250px] 2xl:min-w-[250px] 2xl:min-h-[250px]',
                 'bg-skeleton aspect-square bg-cover bg-center rounded',
                 'shadow-header-image overflow-hidden relative',
@@ -86,7 +87,9 @@ export default function ImageHeader({
               <LazyLoadImage
                 key={coverArtId}
                 effect="opacity"
-                crossOrigin="anonymous"
+                crossOrigin={
+                  Capacitor.isNativePlatform() ? undefined : 'anonymous'
+                }
                 id="cover-art-image"
                 src={src}
                 alt={coverArtAlt}
@@ -105,7 +108,7 @@ export default function ImageHeader({
               />
             </div>
 
-            <div className="flex w-full max-w-[calc(100%-216px)] 2xl:max-w-[calc(100%-266px)] flex-col justify-end z-10">
+            <div className="flex min-w-0 flex-1 md:max-w-[calc(100%-216px)] 2xl:max-w-[calc(100%-266px)] flex-col justify-end z-10">
               <p className="text-xs 2xl:text-sm font-medium text-shadow-md">
                 {type}
               </p>

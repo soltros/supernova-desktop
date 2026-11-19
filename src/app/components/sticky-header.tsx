@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import clsx from 'clsx'
 import { ComponentPropsWithoutRef, useEffect, useState } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -166,7 +167,9 @@ export function StickyHeaderImage({
               {...props}
               src={src}
               effect="opacity"
-              crossOrigin="anonymous"
+              crossOrigin={
+                Capacitor.isNativePlatform() ? undefined : 'anonymous'
+              }
               id={STICKY_HEADER_IMAGE_ID}
               className="w-full h-full object-cover"
             />

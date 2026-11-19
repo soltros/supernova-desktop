@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import {
   ComponentPropsWithoutRef,
   RefObject,
@@ -52,7 +53,7 @@ export function AudioPlayer({
 
   const { resumeContext, setupGain } = useAudioContext(audioRef.current)
 
-  const ignoreGain = !isSong || replayGainError
+  const ignoreGain = Capacitor.isNativePlatform() || !isSong || replayGainError
 
   useEffect(() => {
     if (ignoreGain || !audioRef.current) return
@@ -106,7 +107,7 @@ export function AudioPlayer({
 
       try {
         if (isPlaying) {
-          if (isSong) await resumeContext()
+          if (!ignoreGain) await resumeContext()
           await audio.play()
         } else {
           audio.pause()
@@ -121,13 +122,14 @@ export function AudioPlayer({
         handleSongError()
       }
     }
-    if (isSong || isPodcast) void handleSong()
+    if (isSong || isPodcast) handleSong()
     return () => {
       active = false
     }
   }, [
     audioRef,
     handleSongError,
+    ignoreGain,
     isPlaying,
     isSong,
     isPodcast,
@@ -157,11 +159,7 @@ export function AudioPlayer({
     return undefined
   }, [handleRadioError, handleSongError, isRadio, isSong])
 
-  const crossOrigin = useMemo(() => {
-    if (!isSong || replayGainError) return undefined
-
-    return 'anonymous'
-  }, [isSong, replayGainError])
+  const crossOrigin = ignoreGain ? undefined : 'anonymous'
 
   return (
     <audio

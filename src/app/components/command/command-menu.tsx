@@ -33,7 +33,11 @@ export type CommandItemProps = {
   runCommand: (command: () => unknown) => void
 }
 
-export default function CommandMenu() {
+export default function CommandMenu({
+  hideTrigger = false,
+}: {
+  hideTrigger?: boolean
+}) {
   const { t } = useTranslation()
   const { state: sidebarState } = useMainSidebar()
   const { open, setOpen } = useAppStore((state) => state.command)
@@ -127,7 +131,7 @@ export default function CommandMenu() {
 
   return (
     <>
-      {sidebarOpen && (
+      {sidebarOpen && !hideTrigger && (
         <Button
           variant="outline"
           className="flex justify-start w-full px-2 gap-2 relative min-w-max active:scale-[98%] transition hover:bg-background-foreground/80"
@@ -220,7 +224,7 @@ export default function CommandMenu() {
               {activePage === 'SERVER' && <CommandServer />}
             </CommandList>
           </ScrollArea>
-          <div className="flex justify-end p-2 h-10 gap-1 border-t">
+          <div className="hidden md:flex justify-end p-2 h-10 gap-1 border-t">
             <Keyboard text="ESC" className="text-sm" />
             <Keyboard text="↓" className="text-sm" />
             <Keyboard text="↑" className="text-sm" />

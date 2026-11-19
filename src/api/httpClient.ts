@@ -1,3 +1,4 @@
+import { Capacitor, CapacitorHttp } from '@capacitor/core'
 import { useAppStore } from '@/store/app.store'
 import type { CoverArt } from '@/types/coverArtType'
 export type QueryType = Record<string, string | number | undefined>
@@ -34,7 +35,6 @@ export async function requestAt<T>(
   if (token) headers.set('Authorization', `Bearer ${token}`)
   if (init.body && !(init.body instanceof FormData))
     headers.set('Content-Type', 'application/json')
-  const deadline = AbortSignal.timeout(30000)
   let response: Response
   if (window.api?.supernovaRequest) {
     init.signal?.throwIfAborted()
@@ -46,7 +46,27 @@ export async function requestAt<T>(
     })
     init.signal?.throwIfAborted()
     response = new Response(reply.body || null, { status: reply.status })
-  } else
+  } else if (Capacitor.isNativePlatform()) {
+    init.signal?.throwIfAborted()
+    if (url.protocol !== 'https:')
+      throw new Error('Enter an HTTPS Supernova server URL for mobile.')
+    const reply = await CapacitorHttp.request({
+      url: url.toString(),
+      method: init.method || 'GET',
+      headers: Object.fromEntries(headers),
+      data: init.body,
+      connectTimeout: 30000,
+      readTimeout: 30000,
+      disableRedirects: true,
+    })
+    init.signal?.throwIfAborted()
+    const body =
+      [204, 205, 304].includes(reply.status) || reply.data === ''
+        ? null
+        : JSON.stringify(reply.data)
+    response = new Response(body, { status: reply.status })
+  } else {
+    const deadline = AbortSignal.timeout(30000)
     response = await fetch(url, {
       ...init,
       headers,
@@ -54,6 +74,7 @@ export async function requestAt<T>(
       redirect: 'error',
       credentials: 'omit',
     })
+  }
   if (!response.ok)
     throw new Error(
       (await response.text()).slice(0, 400) ||
@@ -78,8 +99,7 @@ export async function pages<T>(
   offset = 0,
 ): Promise<T[]> {
   const session = useAppStore.getState().data
-  const sessionUrl = session.url,
-    sessionToken = session.token
+  const { url: sessionUrl, token: sessionToken } = session
   const result: T[] = []
   while (result.length < count) {
     const current = useAppStore.getState().data

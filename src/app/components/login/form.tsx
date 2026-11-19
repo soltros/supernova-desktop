@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import clsx from 'clsx'
@@ -39,16 +40,22 @@ const loginSchema = z.object({
   url: z
     .string()
     .url({ message: 'login.form.validations.url' })
-    .refine((value) => /^https?:\/\//.test(value), {
+    .refine((value) => /^https?:\/\//i.test(value), {
       message: 'login.form.validations.protocol',
-    }),
+    })
+    .refine(
+      (value) => !Capacitor.isNativePlatform() || /^https:\/\//i.test(value),
+      {
+        message: 'Enter an HTTPS Supernova server URL for mobile.',
+      },
+    ),
   username: z.string({ required_error: 'login.form.validations.username' }),
   password: z.string({ required_error: 'login.form.validations.password' }),
 })
 
 type FormData = z.infer<typeof loginSchema>
 
-const defaultUrl = 'http://localhost:8080'
+const defaultUrl = Capacitor.isNativePlatform() ? '' : 'http://localhost:8080'
 const url = window.SERVER_URL || defaultUrl
 const urlIsValid = url !== defaultUrl
 
@@ -91,7 +98,7 @@ export function LoginForm() {
 
   return (
     <>
-      <Card className="w-[450px] bg-background-foreground">
+      <Card className="w-full max-w-[450px] bg-background-foreground">
         <Form {...form}>
           <form onSubmit={form.handleSubmit((data) => onSubmit(data))}>
             <CardHeader className="flex">
