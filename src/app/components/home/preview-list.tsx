@@ -52,7 +52,7 @@ export default function PreviewList({
   }, [api])
 
   return (
-    <div className="w-full flex flex-col mt-4">
+    <div className="mobile-shelf w-full flex flex-col mt-4">
       <div className="my-4 flex justify-between items-center">
         <h3
           className="scroll-m-20 text-2xl font-semibold tracking-tight"
@@ -68,7 +68,7 @@ export default function PreviewList({
               </p>
             </Link>
           )}
-          <div className="flex gap-2">
+          <div className="mobile-shelf-arrows flex gap-2">
             <CarouselButton
               direction="prev"
               disabled={!canScrollPrev}
@@ -98,7 +98,7 @@ export default function PreviewList({
             {list.map((album, index) => (
               <CarouselItem
                 key={album.id}
-                className="basis-1/6 2xl:basis-1/8"
+                className="mobile-shelf-card basis-1/6 2xl:basis-1/8"
                 data-testid={`preview-list-carousel-item-${index}`}
               >
                 <AlbumGridCard album={album} />

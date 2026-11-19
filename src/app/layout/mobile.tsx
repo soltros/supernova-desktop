@@ -1,68 +1,65 @@
-import { Search } from 'lucide-react'
+import { ChevronLeft, House, Library, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
-import CommandMenu from '@/app/components/command/command-menu'
-import { AppTitle } from '@/app/components/header/app-title'
-import { NavigationButtons } from '@/app/components/header/navigation-buttons'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { UserDropdown } from '@/app/components/header/user-dropdown'
 import { Player } from '@/app/components/player/player'
 import { SettingsButton } from '@/app/components/settings/header-button'
-import { Button } from '@/app/components/ui/button'
-import { useAppStore } from '@/store/app.store'
+import { ROUTES } from '@/routes/routesList'
 import { MainRoutes } from './main'
-import { libraryItems, mainNavItems, SidebarItems } from './sidebar'
 
 const tabs = [
-  ...mainNavItems,
-  ...libraryItems.filter(({ id }) =>
-    [
-      SidebarItems.Albums,
-      SidebarItems.Artists,
-      SidebarItems.Playlists,
-    ].includes(id),
-  ),
+  { to: ROUTES.LIBRARY.HOME, label: 'sidebar.home', Icon: House },
+  { to: ROUTES.LIBRARY.ROOT, label: 'sidebar.library', Icon: Library },
+  { to: ROUTES.SEARCH, label: 'sidebar.search', Icon: Search },
 ]
 
 export function MobileLayout() {
   const { t } = useTranslation()
-  const openSearch = useAppStore((state) => state.command.setOpen)
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const section = tabs.find(({ to }) => to === pathname)
+  const parent =
+    pathname.split('/').length > 3
+      ? pathname.slice(0, pathname.lastIndexOf('/'))
+      : ROUTES.LIBRARY.ROOT
 
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden bg-background [padding-top:env(safe-area-inset-top)] [padding-left:env(safe-area-inset-left)] [padding-right:env(safe-area-inset-right)]">
-      <header className="flex shrink-0 items-center justify-between gap-2 border-b px-2 py-1">
-        <NavigationButtons />
-        <AppTitle mobile />
-        <div className="flex items-center">
+    <div className="mobile-shell">
+      <header className="mobile-toolbar">
+        {!section && (
+          <Link
+            to={parent}
+            className="mobile-back"
+            onClick={(event) => {
+              if (window.history.state?.idx > 0) {
+                event.preventDefault()
+                navigate(-1)
+              }
+            }}
+          >
+            <ChevronLeft size={22} aria-hidden />
+            <span>{t('generic.back', { defaultValue: 'Back' })}</span>
+          </Link>
+        )}
+        <div className="mobile-toolbar-actions">
           <SettingsButton />
-          <UserDropdown />
+          <UserDropdown mobile />
         </div>
       </header>
       <div className="min-h-0 flex-1">
         <MainRoutes />
       </div>
       <Player mobile />
-      <nav className="grid shrink-0 grid-cols-5 border-t [padding-bottom:env(safe-area-inset-bottom)]">
-        {tabs.map(({ id, route, title, icon: Icon }) => (
-          <NavLink
-            key={id}
-            to={route}
-            end={route === '/'}
-            className="flex min-h-14 flex-col items-center justify-center gap-1 text-xs text-muted-foreground aria-[current=page]:text-primary"
-          >
-            <Icon className="size-5" />
-            {t(title)}
+      <nav className="mobile-tabs" aria-label={t('sidebar.library')}>
+        {tabs.map(({ to, label, Icon }) => (
+          <NavLink key={to} to={to} end={to === '/'} className="mobile-tab">
+            <span className="mobile-tab-icon">
+              <Icon size={21} aria-hidden />
+            </span>
+            {t(label)}
           </NavLink>
         ))}
-        <Button
-          variant="ghost"
-          className="h-14 flex-col gap-1 rounded-none px-0 text-xs text-muted-foreground"
-          onClick={() => openSearch(true)}
-        >
-          <Search className="size-5" />
-          {t('sidebar.search')}
-        </Button>
       </nav>
-      <CommandMenu hideTrigger />
     </div>
   )
 }

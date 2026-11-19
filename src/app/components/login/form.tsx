@@ -98,7 +98,7 @@ export function LoginForm() {
 
   return (
     <>
-      <Card className="w-full max-w-[450px] bg-background-foreground">
+      <Card className="mobile-login-card w-full max-w-[450px] bg-background-foreground">
         <Form {...form}>
           <form onSubmit={form.handleSubmit((data) => onSubmit(data))}>
             <CardHeader className="flex">

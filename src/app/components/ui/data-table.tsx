@@ -457,6 +457,7 @@ export function DataTable<TData, TValue>({
                         )}
                         style={columnDef.style}
                         role="columnheader"
+                        data-column={header.column.id}
                       >
                         {header.isPlaceholder
                           ? null

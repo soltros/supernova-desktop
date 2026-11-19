@@ -45,6 +45,29 @@ const options: OptionsData[] = [
   { id: 'privacy', icon: EarthLock },
 ]
 
+export function SettingsSectionPicker() {
+  const { t } = useTranslation()
+  const { currentPage, setCurrentPage } = useAppSettings()
+
+  return (
+    <select
+      className="mx-4 mb-3 min-h-11 rounded-xl border bg-background px-3 text-base md:hidden"
+      aria-label={t('settings.label')}
+      value={currentPage}
+      onChange={(event) => {
+        const option = options.find(({ id }) => id === event.target.value)
+        if (option) setCurrentPage(option.id)
+      }}
+    >
+      {options.map(({ id }) => (
+        <option key={id} value={id}>
+          {t(`settings.options.${id}`)}
+        </option>
+      ))}
+    </select>
+  )
+}
+
 export function SettingsOptions() {
   const { t } = useTranslation()
   const { currentPage, setCurrentPage } = useAppSettings()

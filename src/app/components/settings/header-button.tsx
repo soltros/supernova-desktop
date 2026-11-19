@@ -18,6 +18,7 @@ export function SettingsButton() {
       <Button
         variant="ghost"
         size="sm"
+        aria-label={t('settings.label')}
         onClick={() => setOpenDialog(true)}
         className="h-8 w-8 p-0 rounded-md"
       >

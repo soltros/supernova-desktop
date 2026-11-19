@@ -48,6 +48,8 @@ export function MiniPlayerControls() {
           'mini-player:hidden',
         )}
         style={{ ...buttonsStyle.style }}
+        aria-label="Shuffle"
+        aria-pressed={isShuffleActive}
         onClick={() => toggleShuffle()}
         disabled={isPlayingOneSong() || !hasNext}
       >
@@ -62,6 +64,7 @@ export function MiniPlayerControls() {
           'mini-player:hidden',
         )}
         style={{ ...buttonsStyle.style }}
+        aria-label="Previous track"
         onClick={() => playPrevSong()}
         disabled={!hasPrev}
       >
@@ -76,6 +79,7 @@ export function MiniPlayerControls() {
           'mini-player:w-8 mini-player:h-8',
         )}
         style={{ ...buttonsStyle.style }}
+        aria-label={isPlaying ? 'Pause' : 'Play'}
         onClick={() => togglePlayPause()}
       >
         {isPlaying ? (
@@ -99,6 +103,7 @@ export function MiniPlayerControls() {
           'mini-player:w-8 mini-player:h-8',
         )}
         style={{ ...buttonsStyle.style }}
+        aria-label="Next track"
         onClick={() => playNextSong()}
         disabled={!hasNext && loopState !== LoopState.All}
       >
@@ -114,6 +119,8 @@ export function MiniPlayerControls() {
           loopState !== LoopState.Off && buttonsStyle.activeDot,
           'mini-player:hidden',
         )}
+        aria-label="Repeat"
+        aria-pressed={loopState !== LoopState.Off}
         onClick={() => toggleLoop()}
         style={{ ...buttonsStyle.style }}
       >

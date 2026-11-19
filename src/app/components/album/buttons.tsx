@@ -84,19 +84,26 @@ export function AlbumButtons({ album, showInfoButton }: AlbumButtonsProps) {
   }
 
   return (
-    <Actions.Container>
+    <Actions.Container className="mobile-album-actions">
       <Actions.Button
         tooltip={buttonsTooltips.play}
         buttonStyle="primary"
+        aria-label={buttonsTooltips.play}
         onClick={handlePlayButton}
       >
         {isAlbumPlaying ? <Actions.PauseIcon /> : <Actions.PlayIcon />}
+        <span className="mobile-action-label hidden">
+          {isAlbumPlaying
+            ? t('player.tooltips.pause')
+            : t('player.tooltips.play')}
+        </span>
       </Actions.Button>
 
       {album.song.length > 1 && (
         <Actions.Button
           tooltip={buttonsTooltips.shuffle}
           onClick={handleShuffleButton}
+          aria-label={buttonsTooltips.shuffle}
           isActive={isAlbumActive && isShuffleActive}
         >
           <Actions.ShuffleIcon />

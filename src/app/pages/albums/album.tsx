@@ -115,7 +115,7 @@ export default function Album() {
   const albumComment = album.song.length > 0 ? album.song[0].comment : null
 
   return (
-    <div className="w-full relative">
+    <div className="mobile-album-detail w-full relative">
       <AlbumStickyHeader album={album} />
 
       <ImageHeader

@@ -61,8 +61,10 @@ export function GridViewWrapper<T>({
     }
 
     const pageWidth = scrollDivRef.current.offsetWidth
+    const horizontalPadding =
+      window.innerWidth < 768 ? Math.min(padding, 16) : padding
     const gapsDifference = (gridColumnsSize - 1) * gap
-    const bothSidesPaddingSize = padding * 2
+    const bothSidesPaddingSize = horizontalPadding * 2
     const remainSpace = pageWidth - bothSidesPaddingSize - gapsDifference
 
     const width = remainSpace / gridColumnsSize
@@ -80,7 +82,11 @@ export function GridViewWrapper<T>({
     const handleResize = () => {
       const width = window.innerWidth
 
-      if (width >= 1536) {
+      if (width < 600) {
+        setGridColumnsSize(2)
+      } else if (width < 768) {
+        setGridColumnsSize(3)
+      } else if (width >= 1536) {
         setGridColumnsSize(8) // 2xl breakpoint
       } else if (width >= 1024) {
         setGridColumnsSize(6) // lg breakpoint
@@ -125,7 +131,7 @@ export function GridViewWrapper<T>({
     rows,
     size,
     padding: {
-      x: padding,
+      x: window.innerWidth < 768 ? Math.min(padding, 16) : padding,
     },
     gap,
     overscan: 5,

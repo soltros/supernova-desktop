@@ -21,7 +21,7 @@ import { logoutKeys, shortcutDialogKeys, stringifyShortcut } from '@/shortcuts'
 import { useAppData, useAppStore } from '@/store/app.store'
 import { isMacOS } from '@/utils/desktop'
 
-export function UserDropdown() {
+export function UserDropdown({ mobile = false }: { mobile?: boolean }) {
   const { username, url, lockUser } = useAppData()
   const setLogoutDialogState = useAppStore(
     (state) => state.actions.setLogoutDialogState,
@@ -33,7 +33,7 @@ export function UserDropdown() {
   useHotkeys('shift+ctrl+q', () => setLogoutDialogState(true))
   useHotkeys('mod+/', () => setShortcutsOpen((prev) => !prev))
 
-  const alignPosition = isMacOS ? 'end' : 'center'
+  const alignPosition = mobile || isMacOS ? 'end' : 'center'
 
   return (
     <Fragment>
@@ -43,7 +43,10 @@ export function UserDropdown() {
       <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
 
       <DropdownMenu>
-        <DropdownMenuTrigger className="user-dropdown-trigger">
+        <DropdownMenuTrigger
+          className="user-dropdown-trigger"
+          aria-label={username || t('settings.options.accounts')}
+        >
           <Avatar className="w-8 h-8 rounded-full cursor-pointer">
             <AvatarFallback className="text-sm bg-transparent hover:bg-accent">
               <User className="w-4 h-4" />

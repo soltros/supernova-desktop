@@ -70,14 +70,14 @@ export default function ImageHeader({
           )}
           <div
             className={cn(
-              'flex w-full items-center gap-3 px-4 py-5 md:absolute md:inset-0 md:items-stretch md:gap-4 md:px-8 md:py-6',
+              'mobile-detail-hero flex w-full items-center gap-3 px-4 py-5 md:absolute md:inset-0 md:items-stretch md:gap-4 md:px-8 md:py-6',
               'bg-gradient-to-b from-background/20 to-background/50',
             )}
             style={{ backgroundColor: bgColor }}
           >
             <div
               className={cn(
-                'size-28 shrink-0 md:size-[200px]',
+                'mobile-detail-art size-28 shrink-0 md:size-[200px]',
                 '2xl:w-[250px] 2xl:h-[250px] 2xl:min-w-[250px] 2xl:min-h-[250px]',
                 'bg-skeleton aspect-square bg-cover bg-center rounded',
                 'shadow-header-image overflow-hidden relative',
@@ -108,7 +108,7 @@ export default function ImageHeader({
               />
             </div>
 
-            <div className="flex min-w-0 flex-1 md:max-w-[calc(100%-216px)] 2xl:max-w-[calc(100%-266px)] flex-col justify-end z-10">
+            <div className="mobile-detail-copy flex min-w-0 flex-1 md:max-w-[calc(100%-216px)] 2xl:max-w-[calc(100%-266px)] flex-col justify-end z-10">
               <p className="text-xs 2xl:text-sm font-medium text-shadow-md">
                 {type}
               </p>
@@ -159,9 +159,12 @@ export default function ImageHeader({
           </div>
 
           {isLoading ? (
-            <ImageHeaderEffect className="bg-muted-foreground" />
+            <ImageHeaderEffect className="mobile-detail-effect bg-muted-foreground" />
           ) : (
-            <ImageHeaderEffect style={{ backgroundColor: bgColor }} />
+            <ImageHeaderEffect
+              className="mobile-detail-effect"
+              style={{ backgroundColor: bgColor }}
+            />
           )}
 
           <CustomLightBox
