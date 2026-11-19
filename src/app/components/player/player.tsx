@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core'
+import { flushSync } from 'react-dom'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getSongStreamUrl } from '@/api/httpClient'
 import { getProxyURL } from '@/api/podcastClient'
@@ -62,6 +64,7 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
     handleSongEnded,
     getCurrentProgress,
     getCurrentPodcastProgress,
+    setUpdatePodcastProgress,
   } = usePlayerActions()
   const { currentList, currentSongIndex, radioList, podcastList } =
     usePlayerSonglist()
@@ -77,13 +80,35 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
   const podcast = podcastList[currentSongIndex]
 
   const songId = song?.id
+  const nativeMusic = Capacitor.isNativePlatform() && isSong && Boolean(songId)
+  const token = useAppStore((state) => state.data.token)
+  const nextSong =
+    currentList[currentSongIndex + 1] ??
+    (loopState === LoopState.All ? currentList[0] : undefined)
+  const prepared = useRef<{
+    id: string
+    url: string
+    token: string
+    expires: number
+  }>()
 
   const [songStream, setSongStream] = useState<{ id: string; url: string }>()
   const songStreamUrl = songStream?.id === songId ? songStream?.url : undefined
   useEffect(() => {
     let active = true
+    const next = prepared.current
+    if (
+      nativeMusic &&
+      next?.id === songId &&
+      next.token === token &&
+      next.expires > Date.now()
+    ) {
+      setSongStream({ id: next.id, url: next.url })
+      prepared.current = undefined
+      return
+    }
     setSongStream(undefined)
-    if (songId)
+    if (songId && isSong)
       getSongStreamUrl(songId, undefined, ensureSupportForAlac(song.suffix))
         .then((url) => {
           if (active) setSongStream({ id: songId, url })
@@ -94,7 +119,62 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
     return () => {
       active = false
     }
-  }, [songId, song?.suffix, setPlayingState])
+  }, [isSong, nativeMusic, songId, song?.suffix, setPlayingState, token])
+
+  useEffect(() => {
+    if (
+      !nativeMusic ||
+      !nextSong ||
+      nextSong.id === songId ||
+      loopState === LoopState.One
+    )
+      return
+    let active = true
+    let retryAfter = 0
+    const stop = usePlayerStore.subscribe(
+      (state) => state.playerProgress.progress,
+      (progress) => {
+        const current = usePlayerStore.getState()
+        const remaining = current.playerState.currentDuration - progress
+        if (
+          !current.playerState.isPlaying ||
+          remaining <= 0 ||
+          remaining > 25 ||
+          Date.now() < retryAfter
+        )
+          return
+        const cached = prepared.current
+        if (
+          cached?.id === nextSong.id &&
+          cached.token === token &&
+          cached.expires > Date.now()
+        )
+          return
+        retryAfter = Date.now() + 10_000
+        getSongStreamUrl(
+          nextSong.id,
+          undefined,
+          ensureSupportForAlac(nextSong.suffix),
+        )
+          .then((url) => {
+            if (active)
+              prepared.current = {
+                id: nextSong.id,
+                token,
+                url,
+                expires: Date.now() + 75_000,
+              }
+          })
+          .catch((error) =>
+            logger.info('Could not prepare the next track', error),
+          )
+      },
+    )
+    return () => {
+      active = false
+      stop()
+    }
+  }, [loopState, nativeMusic, nextSong, songId, token])
 
   const getAudioRef = useCallback(() => {
     if (isRadio) return radioRef
@@ -117,8 +197,19 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
     }
   }, [isPodcast, mobile])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: React mounts a new media element when the source changes.
   useEffect(() => {
+    if (!nativeMusic) return
+    const node = audioRef.current
+    setAudioPlayerRef(node)
+    return () => {
+      if (usePlayerStore.getState().playerState.audioPlayerRef === node)
+        setAudioPlayerRef(null)
+    }
+  }, [nativeMusic, setAudioPlayerRef])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Desktop and other media remount on source changes.
+  useEffect(() => {
+    if (nativeMusic) return
     const node = getAudioRef().current
     setAudioPlayerRef(node)
     return () => {
@@ -132,6 +223,7 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
     }
   }, [
     getAudioRef,
+    nativeMusic,
     songStreamUrl,
     songId,
     radio?.id,
@@ -194,7 +286,25 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
 
     const currentProgress = Math.floor(audio.currentTime)
     setProgress(currentProgress)
-  }, [getAudioRef, setProgress])
+    if (
+      isPodcast &&
+      podcast &&
+      currentProgress > 0 &&
+      Math.abs(currentProgress - getCurrentPodcastProgress()) >= 30
+    ) {
+      setUpdatePodcastProgress(currentProgress)
+      podcasts
+        .saveEpisodeProgress(podcast.id, currentProgress)
+        .catch((error) => logger.error('Error sending podcast progress', error))
+    }
+  }, [
+    getAudioRef,
+    getCurrentPodcastProgress,
+    isPodcast,
+    podcast,
+    setProgress,
+    setUpdatePodcastProgress,
+  ])
 
   const setupInitialVolume = useCallback(() => {
     const audio = getAudioRef().current
@@ -207,7 +317,7 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
     if (!isPodcast || !podcast) return
 
     podcasts
-      .saveEpisodeProgress(podcast.id, podcast.duration)
+      .saveEpisodeProgress(podcast.id, podcast.duration, true)
       .then(() => {
         logger.info('Complete progress sent:', podcast.duration)
       })
@@ -304,19 +414,52 @@ export function Player({ mobile = false }: { mobile?: boolean }) {
         </div>
       )}
 
-      {isSong && song && songStreamUrl && (
+      {isSong && song && (nativeMusic || songStreamUrl) && (
         <AudioPlayer
-          key={songStreamUrl}
+          key={nativeMusic ? 'native-music' : songStreamUrl}
           replayGain={trackReplayGain}
           src={songStreamUrl}
           autoPlay={isPlaying}
           audioRef={audioRef}
           loop={loopState === LoopState.One}
           onPlay={() => setPlayingState(true)}
-          onPause={() => setPlayingState(false)}
+          onPause={(event) => {
+            const audio = event.currentTarget
+            if (
+              audio.ended ||
+              (nativeMusic && audio.currentSrc !== songStreamUrl)
+            )
+              return
+            setPlayingState(false)
+          }}
           onLoadedMetadata={setupDuration}
           onTimeUpdate={setupProgress}
-          onEnded={handleSongEnded}
+          onEnded={(event) => {
+            const next = prepared.current
+            if (
+              !nativeMusic ||
+              !next ||
+              next.token !== token ||
+              next.expires <= Date.now()
+            ) {
+              handleSongEnded()
+              return
+            }
+            const audio = event.currentTarget
+            // Commit the prepared source before WebKit can suspend the finished media element.
+            flushSync(() => {
+              handleSongEnded()
+              const { currentList, currentSongIndex } =
+                usePlayerStore.getState().songlist
+              if (currentList[currentSongIndex]?.id === next.id)
+                setSongStream({ id: next.id, url: next.url })
+            })
+            if (audio.getAttribute('src') === next.url) {
+              audio.play().catch(() => {
+                // AudioPlayer owns error reporting and playback state.
+              })
+            }
+          }}
           onLoadStart={setupInitialVolume}
           data-testid="player-song-audio"
         />

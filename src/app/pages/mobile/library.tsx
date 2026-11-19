@@ -1,3 +1,4 @@
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -6,7 +7,8 @@ import { useAppStore } from '@/store/app.store'
 
 export default function MobileLibrary() {
   const { t } = useTranslation()
-  const podcastsActive = useAppStore((state) => state.podcasts.active)
+  const radioEnabled = usePluginEnabled('radiobrowser')
+  const podcastsActive = usePluginEnabled('podcasts')
   const pages = useAppStore((state) => state.pages)
   const hidden = {
     [SidebarItems.Artists]: pages.hideArtistsSection,
@@ -16,7 +18,7 @@ export default function MobileLibrary() {
     [SidebarItems.Favorites]: pages.hideFavoritesSection,
     [SidebarItems.Playlists]: pages.hidePlaylistsSection,
     [SidebarItems.Podcasts]: !podcastsActive,
-    [SidebarItems.Radios]: pages.hideRadiosSection,
+    [SidebarItems.Radios]: pages.hideRadiosSection || !radioEnabled,
   }
 
   return (

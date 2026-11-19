@@ -327,6 +327,7 @@ export function DataTableList<TData, TValue>({
       <div
         className="relative w-full h-full overflow-hidden cursor-default caption-bottom text-sm bg-transparent"
         data-testid="data-table"
+        data-list-type={dataType}
         role="table"
       >
         <div className={clsx(!showHeader && 'hidden')}>

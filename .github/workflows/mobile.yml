@@ -1,9 +1,14 @@
-name: Build Mobile
+name: Build Supernova Preview
 
 on:
   push:
     branches: [mobile/capacitor]
   workflow_dispatch:
+    inputs:
+      draft_release:
+        type: boolean
+        description: Prepare a draft release after all packages build
+        default: true
 
 permissions:
   contents: read
@@ -44,7 +49,9 @@ jobs:
       - name: Build Android APK
         if: matrix.platform == 'android'
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug
+        run: |
+          ./gradlew --no-daemon assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../Supernova-Android.apk
       - name: Build unsigned iPhone IPA
         if: matrix.platform == 'ios'
         run: |
@@ -63,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Supernova-Android
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: Supernova-Android.apk
           if-no-files-found: error
           retention-days: 7
       - name: Upload unsigned iPhone IPA
@@ -74,3 +81,73 @@ jobs:
           path: ${{ runner.temp }}/ipa/Supernova-unsigned.ipa
           if-no-files-found: error
           retention-days: 7
+
+  linux:
+    name: Package Linux desktop
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CYPRESS_INSTALL_BINARY: '0'
+      HUSKY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm electron:build
+      - name: Install Linux packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+      - name: Package DEB, RPM and AppImage
+        run: |
+          set -euo pipefail
+          pnpm exec electron-builder --linux deb rpm AppImage --x64 --publish never
+          mkdir -p preview-assets
+          cp dist/*.deb preview-assets/Supernova-Desktop-amd64.deb
+          cp dist/*.rpm preview-assets/Supernova-Desktop-x86_64.rpm
+          cp dist/*.AppImage preview-assets/Supernova-Desktop-x86_64.AppImage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Supernova-Linux
+          path: preview-assets/
+          if-no-files-found: error
+
+  draft:
+    name: Assemble draft release
+    if: github.ref == 'refs/heads/mobile/capacitor' && (github.event_name == 'push' || inputs.draft_release)
+    needs: [build, linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: preview-assets
+          merge-multiple: true
+      - name: Verify packages and create draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          assets=(
+            Supernova-Desktop-amd64.deb
+            Supernova-Desktop-x86_64.rpm
+            Supernova-Desktop-x86_64.AppImage
+            Supernova-Android.apk
+            Supernova-unsigned.ipa
+          )
+          (
+            cd preview-assets
+            sha256sum "${assets[@]}" > SHA256SUMS
+          )
+          tag="mobile-preview-${GITHUB_RUN_NUMBER}"
+          gh release create "$tag" preview-assets/* --draft --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Supernova desktop and mobile preview ${GITHUB_RUN_NUMBER}" \
+            --notes-file PREVIEW.md

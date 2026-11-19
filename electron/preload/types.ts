@@ -63,6 +63,7 @@ export interface ISupernovaAPI {
     method: string
     token?: string
     body?: string
+    contentType?: string
   }) => Promise<{ status: number; body: string }>
   enterFullScreen: () => void
   exitFullScreen: () => void

@@ -33,7 +33,10 @@ export function UnfollowButton({ title, podcastId }: UnfollowButtonProps) {
   const queryClient = useQueryClient()
 
   const removeMutation = useMutation({
-    mutationFn: podcasts.unfollow,
+    mutationFn: async (id: string) => {
+      const result = await podcasts.unfollow(id)
+      if (!result.success) throw new Error(result.error)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKeys.podcast.all],

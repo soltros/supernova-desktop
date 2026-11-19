@@ -20,7 +20,7 @@ export function MainGrid({ className, ...props }: MainGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4 h-full',
+        'mobile-card-grid grid grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8 gap-4 h-full',
         className,
       )}
       {...props}

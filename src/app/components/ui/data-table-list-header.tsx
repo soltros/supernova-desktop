@@ -21,6 +21,7 @@ export function DataTableListHeader<TData>({
       )}
       style={columnDef.style}
       role="columnheader"
+      data-column={header.column.id}
     >
       {header.isPlaceholder
         ? null

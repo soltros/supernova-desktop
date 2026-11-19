@@ -358,3 +358,145 @@
   display: inline;
   margin-inline-start: 8px;
 }
+
+/* Shared collection and detail screens use the phone's scroll viewport. */
+.mobile-shell {
+  --shadow-header-height: 70px;
+  --content-height: calc(
+    100dvh -
+    10rem -
+    env(safe-area-inset-top, 0px) -
+    env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.mobile-shell .mobile-section-header {
+  height: auto;
+  min-height: var(--shadow-header-height);
+  padding: 10px 16px 12px;
+  background: hsl(var(--background));
+  border-color: var(--mobile-line);
+}
+.mobile-shell .mobile-section-header > div {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mobile-shell .mobile-section-title {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+.mobile-shell .mobile-section-header button,
+.mobile-shell .mobile-section-header a[role="button"] {
+  min-height: 44px;
+}
+.mobile-shell .mobile-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 14px;
+}
+.mobile-shell .mobile-card-grid > * {
+  min-width: 0;
+}
+.mobile-shell .mobile-card-grid:has(> :only-child) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mobile-shell [data-list-type] [role="row"] {
+  width: 100%;
+  padding-inline-end: 0;
+}
+.mobile-shell [data-list-type] [role="columnheader"] {
+  height: 40px;
+}
+.mobile-shell [data-list-type] [role="cell"],
+.mobile-shell [data-list-type] [role="columnheader"] {
+  padding-inline: 8px;
+}
+.mobile-shell
+  [data-list-type]
+  :is([data-column="title"], [data-column="name"], [data-column="value"]) {
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.mobile-shell
+  [data-list-type]
+  :is(
+    [data-column="index"],
+    [data-column="trackNumber"],
+    [data-column="select"],
+    [data-column="starred"],
+    [data-column="actions"]
+  ) {
+  flex: 0 0 40px;
+  min-width: 0 !important;
+}
+.mobile-shell [data-list-type] [data-column="duration"] {
+  flex: 0 0 58px;
+  min-width: 0 !important;
+}
+.mobile-shell
+  [data-list-type]
+  :is(
+    [data-column="artist"],
+    [data-column="album"],
+    [data-column="year"],
+    [data-column="playCount"],
+    [data-column="played"],
+    [data-column="bpm"],
+    [data-column="bitRate"],
+    [data-column="contentType"],
+    [data-column="comment"],
+    [data-column="homePageUrl"],
+    [data-column="streamUrl"]
+  ) {
+  display: none;
+}
+
+.mobile-shell .mobile-podcast-hero {
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px 20px;
+}
+.mobile-shell .mobile-podcast-hero > :last-child {
+  width: 100%;
+  min-width: 0;
+}
+.mobile-shell .mobile-podcast-hero h1 {
+  overflow-wrap: anywhere;
+}
+.mobile-shell .mobile-podcast-art {
+  width: min(58vw, 240px);
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 15px;
+}
+.mobile-shell :is(input, textarea, select) {
+  font-size: 16px;
+}
+
+@media (max-width: 767px) {
+  .app-dialog:not(.mobile-now-playing) {
+    width: min(100% - 24px, 34rem);
+    max-height: calc(
+      100dvh -
+      24px -
+      env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+    );
+    overflow-y: auto;
+    border-radius: 16px;
+  }
+  .app-dialog :is(input, textarea, select) {
+    font-size: 16px;
+  }
+  .app-dialog.mobile-settings {
+    overflow: hidden;
+  }
+  .mobile-settings main {
+    min-height: 0;
+  }
+}

@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { LyricsTab } from '@/app/components/fullscreen/lyrics'
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import { ChevronDown, Pause, Play, SkipForward } from 'lucide-react'
 import { FullscreenProgress } from '@/app/components/fullscreen/progress'
 import { ImageLoader } from '@/app/components/image-loader'
@@ -14,6 +17,8 @@ import {
 } from '@/store/player.store'
 
 export function MobilePlayer() {
+  const canShowLyrics = usePluginEnabled('lrclib')
+  const [lyricsOpen, setLyricsOpen] = useState(false)
   const { currentList, currentSongIndex, radioList, podcastList } =
     usePlayerSonglist()
   const { isSong, isRadio } = usePlayerMediaType()
@@ -81,7 +86,13 @@ export function MobilePlayer() {
           </Button>
         )}
       </div>
-      <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+      <Dialog
+        open={isFullscreen}
+        onOpenChange={(open) => {
+          setIsFullscreen(open)
+          if (!open) setLyricsOpen(false)
+        }}
+      >
         <DialogContent
           aria-describedby={undefined}
           className="mobile-now-playing flex h-dvh max-w-none flex-col gap-0 overflow-y-auto rounded-none border-0"
@@ -92,7 +103,10 @@ export function MobilePlayer() {
               size="icon"
               className="size-11 rounded-full bg-foreground/10"
               aria-label="Close Now Playing"
-              onClick={() => setIsFullscreen(false)}
+              onClick={() => {
+                setLyricsOpen(false)
+                setIsFullscreen(false)
+              }}
             >
               <ChevronDown size={22} />
             </Button>
@@ -134,6 +148,22 @@ export function MobilePlayer() {
               )}
             </div>
           </div>
+          {song && canShowLyrics && (
+            <div className="mx-auto w-full max-w-[370px] shrink-0">
+              <Button
+                variant="ghost"
+                aria-expanded={lyricsOpen}
+                onClick={() => setLyricsOpen(!lyricsOpen)}
+              >
+                Lyrics
+              </Button>
+              {lyricsOpen && (
+                <div className="h-64 overflow-auto">
+                  <LyricsTab />
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

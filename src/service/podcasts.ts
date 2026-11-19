@@ -106,7 +106,18 @@ async function getOne(
   id: string,
   p: ShowParams = {},
 ): Promise<PodcastWithEpisodes> {
-  if (!feeds.has(id)) await getAll({ per_page: 10000 })
+  if (!feeds.has(id)) {
+    await getAll({ per_page: 10000 })
+    if (!feeds.has(id)) {
+      const favorites = await request<{ podcasts?: Feed[] | null }>(
+        '/api/hearts/details',
+      )
+      const saved = favorites.podcasts?.find(
+        (feed) => String(feed.feed_id ?? feed.id) === id,
+      )
+      if (saved) feedModel(saved)
+    }
+  }
   const feed = feeds.get(id) || {
     id,
     title: 'Podcast',
@@ -138,7 +149,7 @@ async function getOne(
     audio_url: e.enclosureUrl,
     image_url: e.image || e.feedImage || feed.image_url,
     duration: e.duration || 0,
-    published_at: new Date(e.datePublished * 1000).toISOString(),
+    published_at: new Date((e.datePublished || 0) * 1000).toISOString(),
     created_at: '',
     updated_at: '',
     playback: progress[String(e.id)]
@@ -236,6 +247,7 @@ async function searchEpisodes(
 async function saveEpisodeProgress(
   id: string,
   progress: number,
+  completed = false,
 ): Promise<Playback> {
   const nativeID = id.slice(id.indexOf(':') + 1)
   await request('/api/plugins/podcasts/progress', {
@@ -243,10 +255,10 @@ async function saveEpisodeProgress(
     body: JSON.stringify({
       episode_id: nativeID,
       position_ms: Math.max(0, Math.round(progress * 1000)),
-      completed: false,
+      completed,
     }),
   })
-  return { progress, completed: false }
+  return { progress, completed }
 }
 export const podcasts = {
   search,

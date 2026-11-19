@@ -1,5 +1,6 @@
 import { GlobeIcon, RssIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { ExternalFavoriteButton } from '@/app/components/external-favorite-button'
 import { Dot } from '@/app/components/dot'
 import { Separator } from '@/app/components/ui/separator'
 import { Podcast } from '@/types/responses/podcasts'
@@ -23,6 +24,11 @@ export function PodcastInfo({ podcast }: PodcastInfoProps) {
       <Root>
         <div className="flex gap-3 items-center">
           <Title>{podcast.title}</Title>
+          <ExternalFavoriteButton
+            id={podcast.id}
+            kind="podcast"
+            metadata={{ ...podcast, feed_id: podcast.id }}
+          />
           <UnfollowButton title={podcast.title} podcastId={podcast.id} />
         </div>
         <Subtitle>{podcast.author}</Subtitle>

@@ -1,6 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { PlusIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { ROUTES } from '@/routes/routesList'
 import { useTranslation } from 'react-i18next'
 import { ShadowHeader } from '@/app/components/album/shadow-header'
 import { HeaderTitle } from '@/app/components/header-title'
@@ -24,7 +26,7 @@ export function PodcastsHeader() {
 
   return (
     <ShadowHeader>
-      <div className="w-full flex justify-between">
+      <div className="w-full flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-2 items-center">
           <HeaderTitle title={t('sidebar.podcasts')} />
           <Button
@@ -38,6 +40,11 @@ export function PodcastsHeader() {
         </div>
 
         <div className="flex gap-2 items-center">
+          <Button asChild variant="ghost" size="sm">
+            <Link to={ROUTES.EPISODES.LATEST}>
+              {t('podcasts.form.latestEpisodes')}
+            </Link>
+          </Button>
           <PodcastsFilters />
 
           <Button

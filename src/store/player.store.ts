@@ -7,6 +7,7 @@ import { devtools, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { shallow } from 'zustand/shallow'
 import { createWithEqualityFn } from 'zustand/traditional'
+import { sendLastFm } from '@/service/lastfm'
 import { scrobble } from '@/service/scrobble'
 import { supernova } from '@/service/supernova'
 import {
@@ -1086,7 +1087,9 @@ usePlayerStore.subscribe((state, prevState) => {
   if (progress >= 1 && prevProgress < 1 && !hasSynced) {
     usePlayerStore.getState().actions.setHasSyncedTheCurrentTrack(true)
 
-    scrobble.send(currentSong.id, false)
+    sendLastFm(currentSong, false).catch((error) =>
+      logger.error('Last.fm now playing failed', error),
+    )
   }
 
   const timeDelta = progress - prevProgress
@@ -1107,6 +1110,9 @@ usePlayerStore.subscribe((state, prevState) => {
   if (duration >= 30 && accumulatedTime >= targetTime && !hasScrobbled) {
     usePlayerStore.getState().actions.setHasScrobbledTheCurrentTrack(true)
 
+    sendLastFm(currentSong, true).catch((error) =>
+      logger.error('Last.fm scrobble failed', error),
+    )
     void scrobble
       .send(currentSong.id, true)
       .catch((error) => logger.error('Scrobble failed', error))

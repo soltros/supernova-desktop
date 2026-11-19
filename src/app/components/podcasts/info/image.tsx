@@ -19,7 +19,7 @@ export function PodcastInfoImage({ src, alt }: PodcastInfoImageProps) {
   return (
     <div
       className={clsx(
-        'w-[200px] h-[200px] min-w-[200px] min-h-[200px]',
+        'mobile-podcast-art w-[200px] h-[200px] min-w-[200px] min-h-[200px]',
         '2xl:w-[250px] 2xl:h-[250px] 2xl:min-w-[250px] 2xl:min-h-[250px]',
         'bg-skeleton aspect-square bg-cover bg-center rounded',
         'shadow-custom-5 border border-border overflow-hidden',

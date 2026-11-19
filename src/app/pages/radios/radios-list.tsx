@@ -9,6 +9,7 @@ import { HeaderTitle } from '@/app/components/header-title'
 import ListWrapper from '@/app/components/list-wrapper'
 import { EmptyRadiosInfo } from '@/app/components/radios/empty-message'
 import { RadioFormDialog } from '@/app/components/radios/form-dialog'
+import { StationSearch } from '@/app/components/radios/station-search'
 import { RemoveRadioDialog } from '@/app/components/radios/remove-dialog'
 import { Button } from '@/app/components/ui/button'
 import { DataTable } from '@/app/components/ui/data-table'
@@ -60,6 +61,10 @@ export default function Radios() {
           </Button>
         </div>
       </ShadowHeader>
+
+      <ListWrapper>
+        <StationSearch saved={radios ?? []} />
+      </ListWrapper>
 
       {showTable && (
         <ListWrapper>

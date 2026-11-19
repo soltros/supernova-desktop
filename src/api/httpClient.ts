@@ -4,6 +4,7 @@ import type { CoverArt } from '@/types/coverArtType'
 export type QueryType = Record<string, string | number | undefined>
 export interface FetchOptions extends RequestInit {
   query?: QueryType
+  responseFormat?: 'text'
 }
 export function normalizeServerUrl(value: string) {
   const url = new URL(value)
@@ -30,10 +31,14 @@ export async function requestAt<T>(
   const url = new URL(normalizeServerUrl(base) + path)
   for (const [key, value] of Object.entries(options.query || {}))
     if (value !== undefined) url.searchParams.set(key, String(value))
-  const { query: _, ...init } = options
+  const { query: _, responseFormat, ...init } = options
   const headers = new Headers(init.headers)
   if (token) headers.set('Authorization', `Bearer ${token}`)
-  if (init.body && !(init.body instanceof FormData))
+  if (
+    init.body &&
+    !headers.has('Content-Type') &&
+    !(init.body instanceof FormData)
+  )
     headers.set('Content-Type', 'application/json')
   let response: Response
   if (window.api?.supernovaRequest) {
@@ -42,6 +47,10 @@ export async function requestAt<T>(
       url: url.toString(),
       method: init.method || 'GET',
       token,
+      ...(headers.has('Content-Type') &&
+      headers.get('Content-Type') !== 'application/json'
+        ? { contentType: headers.get('Content-Type')! }
+        : {}),
       body: typeof init.body === 'string' ? init.body : undefined,
     })
     init.signal?.throwIfAborted()
@@ -55,6 +64,7 @@ export async function requestAt<T>(
       method: init.method || 'GET',
       headers: Object.fromEntries(headers),
       data: init.body,
+      responseType: responseFormat,
       connectTimeout: 30000,
       readTimeout: 30000,
       disableRedirects: true,
@@ -63,7 +73,9 @@ export async function requestAt<T>(
     const body =
       [204, 205, 304].includes(reply.status) || reply.data === ''
         ? null
-        : JSON.stringify(reply.data)
+        : typeof reply.data === 'string'
+          ? reply.data
+          : JSON.stringify(reply.data)
     response = new Response(body, { status: reply.status })
   } else {
     const deadline = AbortSignal.timeout(30000)
@@ -82,6 +94,7 @@ export async function requestAt<T>(
     )
   if (response.status === 204) return undefined as T
   const text = await response.text()
+  if (responseFormat === 'text') return text as T
   return text ? (JSON.parse(text) as T) : (undefined as T)
 }
 export async function request<T>(path: string, options: FetchOptions = {}) {

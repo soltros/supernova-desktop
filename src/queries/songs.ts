@@ -52,7 +52,5 @@ export async function getArtistAllSongs(artistId: string) {
 export async function getFavoriteSongs() {
   const response = await supernova.songs.getFavoriteSongs()
 
-  if (!response || !response.song) return { songs: [] }
-
-  return { songs: response.song }
+  return { ...response, songs: response.song }
 }

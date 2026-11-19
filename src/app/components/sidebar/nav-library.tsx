@@ -1,3 +1,4 @@
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import { useTranslation } from 'react-i18next'
 import {
   MainSidebarGroup,
@@ -18,12 +19,10 @@ export function NavLibrary() {
   const hideGenresSection = useAppStore().pages.hideGenresSection
   const hideFavoritesSection = useAppStore().pages.hideFavoritesSection
   const hidePlaylistsSection = useAppStore().pages.hidePlaylistsSection
-  const hideRadiosSection = useAppStore().pages.hideRadiosSection
-  const isPodcastsActive = useAppStore().podcasts.active
-
-  const isAllSectionsHidden = useAppStore().pages.isAllSectionsHidden()
-
-  if (isAllSectionsHidden) return null
+  const radioEnabled = usePluginEnabled('radiobrowser')
+  const hideRadiosSection =
+    useAppStore().pages.hideRadiosSection || !radioEnabled
+  const isPodcastsActive = usePluginEnabled('podcasts')
 
   return (
     <MainSidebarGroup className="px-4 py-0">

@@ -341,3 +341,85 @@ it('never sends an old account media ticket to a newly selected server', async (
   resolve(reply({ ticket: 'old-ticket' }))
   await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
 })
+
+it('reads the plugin manifest and searches radio stations through native HTTP', async () => {
+  vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true)
+  const native = vi.spyOn(CapacitorHttp, 'request')
+  native.mockResolvedValueOnce({
+    status: 200,
+    data: '[{"id":"radiobrowser","enabled":true}]',
+    headers: {},
+    url: 'https://music.example/api/plugins',
+  })
+  native.mockResolvedValueOnce({
+    status: 200,
+    data: [
+      {
+        stationuuid: 'station',
+        name: 'Station',
+        url_resolved: 'https://radio.example/live',
+      },
+    ],
+    headers: {},
+    url: 'https://music.example/api/plugins/radio/search',
+  })
+  const { getPlugins } = await import('@/service/plugins')
+  await expect(getPlugins()).resolves.toEqual([
+    { id: 'radiobrowser', enabled: true },
+  ])
+  await expect(
+    supernova.radios.search('Station', 'Canada', 20),
+  ).resolves.toMatchObject([
+    { id: 'station', streamUrl: 'https://radio.example/live' },
+  ])
+  expect(native.mock.calls[1][0].url).toContain('country=Canada&offset=20')
+})
+
+it('preserves the OPML content type through the Electron bridge', async () => {
+  const bridge = vi
+    .fn()
+    .mockResolvedValue({ status: 202, body: 'Import started in background' })
+  ;(window as any).api = { supernovaRequest: bridge }
+  const { importBackup } = await import('@/service/backups')
+  const opml =
+    '<opml><body><outline xmlUrl="https://example.test/rss"/></body></opml>'
+  await expect(
+    importBackup('podcasts', new File([opml], 'backup.opml')),
+  ).resolves.toBe('Import started in background')
+  expect(bridge).toHaveBeenCalledWith(
+    expect.objectContaining({
+      url: 'https://music.example/api/plugins/podcasts/opml/import',
+      contentType: expect.stringMatching(
+        /^multipart\/form-data; boundary=supernova-/,
+      ),
+      body: expect.stringContaining(opml),
+    }),
+  )
+})
+
+it('creates an account using the server invite flow', async () => {
+  fetchMock.mockResolvedValue(
+    reply(
+      { token: 'new', user: { username: 'registered', is_admin: false } },
+      201,
+    ),
+  )
+  await expect(
+    useAppStore.getState().actions.saveConfig(
+      {
+        url: 'https://music.example',
+        username: 'registered',
+        password: 'example-password',
+      },
+      { inviteCode: 'invite' },
+    ),
+  ).resolves.toBe(true)
+  expect(String(fetchMock.mock.calls[0][0])).toBe(
+    'https://music.example/api/auth/register',
+  )
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+    username: 'registered',
+    password: 'example-password',
+    invite_code: 'invite',
+  })
+})

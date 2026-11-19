@@ -23,7 +23,9 @@ export function SettingsBreadcrumb() {
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
               <BreadcrumbPage>
-                {t(`settings.options.${currentPage}`)}
+                {t(`settings.options.${currentPage}`, {
+                  defaultValue: 'Server',
+                })}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>

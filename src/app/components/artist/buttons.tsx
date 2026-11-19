@@ -50,6 +50,7 @@ export function ArtistButtons({
     if (!artist) return
     starMutation.mutate({
       id: artist.id,
+      entityType: 'artist',
       starred: isArtistStarred,
     })
   }

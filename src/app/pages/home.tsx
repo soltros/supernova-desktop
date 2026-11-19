@@ -1,3 +1,4 @@
+import { Discovery } from '@/app/components/home/discovery'
 import { Capacitor } from '@capacitor/core'
 import { useTranslation } from 'react-i18next'
 import { useIsMobile } from '@/app/hooks/use-mobile'
@@ -16,6 +17,7 @@ export default function Home() {
         <RecentlyPlayed />
         <RecentlyAdded />
         <Explore />
+        <Discovery />
       </section>
     )
   }
@@ -28,6 +30,7 @@ export default function Home() {
         <RecentlyPlayed />
         <RecentlyAdded />
         <Explore />
+        <Discovery />
       </div>
     </div>
   )

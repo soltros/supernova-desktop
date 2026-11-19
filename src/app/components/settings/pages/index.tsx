@@ -6,6 +6,7 @@ import { Audio } from './audio'
 import { Content } from './content'
 import { Desktop } from './desktop'
 import { Language } from './language'
+import { ServerSettings } from './server'
 import { Privacy } from './privacy'
 
 const pages: Record<SettingsOptions, JSX.Element> = {
@@ -15,6 +16,7 @@ const pages: Record<SettingsOptions, JSX.Element> = {
   content: <Content />,
   accounts: <Accounts />,
   desktop: <Desktop />,
+  server: <ServerSettings />,
   privacy: <Privacy />,
 }
 

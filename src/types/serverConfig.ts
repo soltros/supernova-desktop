@@ -45,6 +45,7 @@ interface IAppPages {
 export interface IAppData extends Omit<IServerConfig, 'password'> {
   token: string
   isAdmin: boolean
+  lastFmSession?: string
   isServerConfigured: boolean
   osType: string
   logoutDialogState: boolean
@@ -57,7 +58,10 @@ export interface IAppActions {
   setOsType: (value: string) => void
   setUrl: (value: string) => void
   setUsername: (value: string) => void
-  saveConfig: (data: IServerConfig) => Promise<boolean>
+  saveConfig: (
+    data: IServerConfig,
+    registration?: { inviteCode: string },
+  ) => Promise<boolean>
   removeConfig: () => void
   setLogoutDialogState: (value: boolean) => void
 }

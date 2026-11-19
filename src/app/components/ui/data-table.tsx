@@ -431,6 +431,7 @@ export function DataTable<TData, TValue>({
             isClassic ? 'bg-background' : 'bg-transparent',
           )}
           data-testid="data-table"
+          data-list-type={dataType}
           role="table"
         >
           {showHeader && (

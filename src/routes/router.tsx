@@ -23,7 +23,11 @@ import {
 } from '@/app/components/fallbacks/song-fallbacks'
 import { albumsLoader } from '@/routes/loaders/albumsLoader'
 import { loginLoader } from '@/routes/loginLoader'
-import { podcastsLoader, protectedLoader } from '@/routes/protectedLoader'
+import {
+  podcastsLoader,
+  protectedLoader,
+  radiosLoader,
+} from '@/routes/protectedLoader'
 import { ROUTES } from '@/routes/routesList'
 
 const BaseLayout = lazy(() => import('@/app/layout/base'))
@@ -136,6 +140,7 @@ export const router = createHashRouter([
       },
       {
         id: 'radios',
+        loader: radiosLoader,
         path: ROUTES.LIBRARY.RADIOS,
         errorElement: <ErrorPage />,
         element: (

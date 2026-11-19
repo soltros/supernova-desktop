@@ -8,6 +8,7 @@ import {
   ScrollArea,
   scrollAreaViewportSelector,
 } from '@/app/components/ui/scroll-area'
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import { supernova } from '@/service/supernova'
 import { useLang } from '@/store/lang.store'
 import { usePlayerRef, usePlayerSonglist } from '@/store/player.store'
@@ -32,15 +33,18 @@ export function LyricsTab() {
   const { currentSong } = usePlayerSonglist()
   const { t } = useTranslation()
 
-  const { id, artist, title, duration } = currentSong
+  const enabled = usePluginEnabled('lrclib')
+  const { id, artist, title, album, duration } = currentSong
 
   const { data: lyrics, isLoading } = useQuery({
-    queryKey: [queryKeys.song.lyrics, artist, title, duration],
+    queryKey: [queryKeys.song.lyrics, artist, title, album, duration],
+    enabled: enabled && Boolean(id && artist && title),
     queryFn: () =>
       supernova.lyrics.getLyrics({
         id,
         artist,
         title,
+        album,
         duration,
       }),
   })
@@ -67,15 +71,13 @@ function SyncedLyrics({ lyrics }: LyricProps) {
   const [progress, setProgress] = useState(0)
   const resolvedLang = resolveLyricsLang(lyrics.lang, langCode)
 
-  setTimeout(() => {
-    let newProgress = (playerRef?.currentTime || 0) * 1000
-
-    if (newProgress === progress) {
-      newProgress += 1 // Prevents the lyrics from getting stuck when the audio is still loading
-    }
-
-    setProgress(newProgress)
-  }, 50)
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setProgress((playerRef?.currentTime ?? 0) * 1000),
+      100,
+    )
+    return () => window.clearInterval(timer)
+  }, [playerRef])
 
   const skipToTime = (timeMs: number) => {
     if (playerRef) {

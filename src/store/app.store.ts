@@ -315,28 +315,49 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.data.username = value
               })
             },
-            saveConfig: async ({ url, username, password }: IServerConfig) => {
+            saveConfig: async (
+              { url, username, password }: IServerConfig,
+              registration,
+            ) => {
               try {
+                const { url: previousUrl, username: previousUsername } =
+                  get().data
                 const base = normalizeServerUrl(url)
                 const auth = await requestAt<{
                   token: string
                   user: { username: string; is_admin: boolean }
-                }>(base, '/api/auth/login', {
-                  method: 'POST',
-                  body: JSON.stringify({ username, password }),
-                })
+                }>(
+                  base,
+                  registration ? '/api/auth/register' : '/api/auth/login',
+                  {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      username,
+                      password,
+                      ...(registration
+                        ? { invite_code: registration.inviteCode }
+                        : {}),
+                    }),
+                  },
+                )
                 invalidateFavorites()
                 queryClient.clear()
                 set((state) => {
                   state.data.url = base
                   state.data.username = auth.user.username
                   state.data.token = auth.token
+                  if (
+                    previousUrl !== base ||
+                    previousUsername !== auth.user.username
+                  )
+                    state.data.lastFmSession = undefined
                   state.data.isAdmin = auth.user.is_admin
                   state.data.serverType = 'supernova'
                   state.data.isServerConfigured = true
                 })
                 return true
-              } catch {
+              } catch (error) {
+                if (registration) throw error
                 return false
               }
             },
@@ -353,6 +374,7 @@ export const useAppStore = createWithEqualityFn<IAppContext>()(
                 state.data.username = ''
                 state.data.token = ''
                 state.data.isAdmin = false
+                state.data.lastFmSession = undefined
                 state.data.serverType = 'supernova'
                 state.data.songCount = null
                 state.data.extensionsSupported = {}

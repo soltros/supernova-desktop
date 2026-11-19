@@ -1,3 +1,4 @@
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { CommandGroup, CommandItem } from '@/app/components/ui/command'
@@ -15,8 +16,10 @@ export function CommandGotoPage({ runCommand }: CommandItemProps) {
   const hideGenresSection = useAppStore().pages.hideGenresSection
   const hideFavoritesSection = useAppStore().pages.hideFavoritesSection
   const hidePlaylistsSection = useAppStore().pages.hidePlaylistsSection
-  const hideRadiosSection = useAppStore().pages.hideRadiosSection
-  const isPodcastsActive = useAppStore().podcasts.active
+  const radioEnabled = usePluginEnabled('radiobrowser')
+  const hideRadiosSection =
+    useAppStore().pages.hideRadiosSection || !radioEnabled
+  const isPodcastsActive = usePluginEnabled('podcasts')
 
   const pages = [...mainNavItems, ...libraryItems]
 

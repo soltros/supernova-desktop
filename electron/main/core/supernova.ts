@@ -17,6 +17,7 @@ export interface NativeApiRequest {
   method: string
   token?: string
   body?: string
+  contentType?: string
 }
 export function validServerTarget(value: string, media = false): URL {
   const url = new URL(value)
@@ -77,7 +78,17 @@ export function installApiBridge(window: BrowserWindow) {
         (payload.body && payload.body.length > 10 * 1024 * 1024)
       )
         throw new Error('Invalid API request')
-      const headers = new Headers({ 'Content-Type': 'application/json' })
+      const contentType = payload.contentType ?? 'application/json'
+      if (
+        contentType !== 'application/json' &&
+        (payload.method !== 'POST' ||
+          !target.pathname.endsWith('/api/plugins/podcasts/opml/import') ||
+          !/^multipart\/form-data; boundary=supernova-[a-f0-9-]+$/.test(
+            contentType,
+          ))
+      )
+        throw new Error('Invalid API content type')
+      const headers = new Headers({ 'Content-Type': contentType })
       if (payload.token) headers.set('Authorization', `Bearer ${payload.token}`)
       const response = await net.fetch(target.toString(), {
         method: payload.method,

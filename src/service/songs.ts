@@ -4,6 +4,7 @@ import {
   NativeTrack,
   NativeAlbum,
   NativeArtist,
+  NativePlaylist,
   songModel,
   albumModel,
   artistModel,
@@ -41,12 +42,33 @@ async function getFavoriteSongs() {
     tracks: NativeTrack[]
     albums: NativeAlbum[]
     artists: NativeArtist[]
+    playlists?: NativePlaylist[]
+    radio?: {
+      stationuuid?: string
+      station_id?: string
+      name: string
+      url?: string
+      url_resolved?: string
+    }[]
+    podcasts?: { id?: string | number; feed_id?: string; title: string }[]
   }>('/api/hearts/details')
   const starred = new Date().toISOString()
   return {
     song: (d.tracks || []).map((t) => ({ ...songModel(t), starred })),
     album: (d.albums || []).map((a) => ({ ...albumModel(a), starred })),
     artist: (d.artists || []).map((a) => ({ ...artistModel(a), starred })),
+    playlists: d.playlists ?? [],
+    radio: (d.radio ?? []).flatMap((station) => {
+      const id = station.stationuuid ?? station.station_id
+      const streamUrl = station.url_resolved || station.url
+      return id && streamUrl && /^https?:\/\//i.test(streamUrl)
+        ? [{ id, name: station.name, streamUrl, homePageUrl: '' }]
+        : []
+    }),
+    podcasts: (d.podcasts ?? []).flatMap((podcast) => {
+      const id = podcast.feed_id ?? podcast.id
+      return id === undefined ? [] : [{ id: String(id), title: podcast.title }]
+    }),
   }
 }
 async function getTopSongs(name: string) {

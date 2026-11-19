@@ -1,3 +1,4 @@
+import { usePluginEnabled } from '@/app/hooks/use-server-plugins'
 import clsx from 'clsx'
 import { MicVocalIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +14,9 @@ export function PlayerLyricsButton({ disabled }: PlayerLyricsButtonProps) {
   const { t } = useTranslation()
   const { mainDrawerState } = useMainDrawerState()
   const { lyricsState, toggleLyricsAction } = useLyricsState()
+
+  const enabled = usePluginEnabled('lrclib')
+  if (!enabled) return null
 
   const isActive = mainDrawerState && lyricsState
 

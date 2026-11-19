@@ -9,7 +9,13 @@ export function PodcastInfoContainer({
   ...rest
 }: ContainerProps) {
   return (
-    <div {...rest} className={cn('w-full px-8 py-6 flex gap-4', className)}>
+    <div
+      {...rest}
+      className={cn(
+        'mobile-podcast-hero w-full px-8 py-6 flex gap-4',
+        className,
+      )}
+    >
       {children}
     </div>
   )

@@ -6,6 +6,7 @@ import {
   Headphones,
   LaptopIcon,
   Paintbrush,
+  Server,
 } from 'lucide-react'
 import { ComponentType } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -27,6 +28,7 @@ export type SettingsOptions =
   | 'accounts'
   | 'desktop'
   | 'privacy'
+  | 'server'
 
 interface OptionsData {
   id: SettingsOptions
@@ -42,6 +44,7 @@ const options: OptionsData[] = [
   { id: 'audio', icon: Headphones },
   { id: 'content', icon: FileText },
   ...(isDesktop() ? [accountsOption, desktopOption] : []),
+  { id: 'server', icon: Server },
   { id: 'privacy', icon: EarthLock },
 ]
 
@@ -61,7 +64,7 @@ export function SettingsSectionPicker() {
     >
       {options.map(({ id }) => (
         <option key={id} value={id}>
-          {t(`settings.options.${id}`)}
+          {t(`settings.options.${id}`, { defaultValue: 'Server' })}
         </option>
       ))}
     </select>
@@ -83,7 +86,9 @@ export function SettingsOptions() {
                 onClick={() => setCurrentPage(item.id)}
               >
                 <item.icon />
-                <span>{t(`settings.options.${item.id}`)}</span>
+                <span>
+                  {t(`settings.options.${item.id}`, { defaultValue: 'Server' })}
+                </span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

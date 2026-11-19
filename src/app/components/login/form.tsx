@@ -50,6 +50,7 @@ const loginSchema = z.object({
       },
     ),
   username: z.string({ required_error: 'login.form.validations.username' }),
+  inviteCode: z.string(),
   password: z.string({ required_error: 'login.form.validations.password' }),
 })
 
@@ -61,6 +62,7 @@ const urlIsValid = url !== defaultUrl
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false)
+  const [registering, setRegistering] = useState(false)
   const { saveConfig } = useAppActions()
   const { hideServer } = useAppData()
   const navigate = useNavigate()
@@ -75,24 +77,37 @@ export function LoginForm() {
       url,
       username: '',
       password: '',
+      inviteCode: '',
     },
   })
 
   async function onSubmit(data: FormData) {
     setLoading(true)
 
-    const status = await saveConfig({
-      ...data,
-      url: removeSlashFromUrl(data.url),
-    })
-
-    if (status) {
+    const { inviteCode, ...credentials } = data
+    try {
+      const status = await saveConfig(
+        {
+          ...credentials,
+          url: removeSlashFromUrl(data.url),
+        },
+        registering ? { inviteCode: inviteCode.trim() } : undefined,
+      )
+      if (!status) {
+        toast.error(t('toast.server.error'))
+        return
+      }
       await queryClient.invalidateQueries()
       toast.success(t('toast.server.success'))
       navigate(ROUTES.LIBRARY.HOME, { replace: true })
-    } else {
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Could not create the account.',
+      )
+    } finally {
       setLoading(false)
-      toast.error(t('toast.server.error'))
     }
   }
 
@@ -179,9 +194,23 @@ export function LoginForm() {
                   </FormItem>
                 )}
               />
+              {registering && (
+                <FormField
+                  control={form.control}
+                  name="inviteCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Invite code</FormLabel>
+                      <FormControl>
+                        <Input {...field} autoComplete="off" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
             </CardContent>
 
-            <CardFooter className="flex">
+            <CardFooter className="flex flex-col gap-2">
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
@@ -189,8 +218,18 @@ export function LoginForm() {
                     {t('login.form.connecting')}
                   </>
                 ) : (
-                  <>{t('login.form.connect')}</>
+                  <>
+                    {registering ? 'Create account' : t('login.form.connect')}
+                  </>
                 )}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={loading}
+                onClick={() => setRegistering(!registering)}
+              >
+                {registering ? 'Back to sign in' : 'Create an account'}
               </Button>
             </CardFooter>
           </form>

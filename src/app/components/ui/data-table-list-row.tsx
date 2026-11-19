@@ -114,6 +114,7 @@ function TableCell<TData, TValue>({ cell }: TableCellProps<TData, TValue>) {
       )}
       style={columnDef.style}
       role="cell"
+      data-column={cell.column.id}
     >
       {flexRender(columnDef.cell, cell.getContext())}
     </div>

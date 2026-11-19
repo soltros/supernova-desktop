@@ -26,7 +26,7 @@ export function usePodcastOptions({ episode }: PodcastOptionsProps) {
 
   const markAsPlayedMutation = useMutation({
     mutationFn: () =>
-      podcasts.saveEpisodeProgress(episode.id, episode.duration),
+      podcasts.saveEpisodeProgress(episode.id, episode.duration, true),
     onSuccess: () => {
       Promise.all([
         queryClient.invalidateQueries({
