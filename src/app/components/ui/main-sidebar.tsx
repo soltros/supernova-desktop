@@ -156,7 +156,7 @@ function MainSidebarProvider({
             } as React.CSSProperties
           }
           className={cn(
-            'group/sidebar-wrapper has-data-[variant=inset]:bg-background flex pt-header pb-player w-full h-full',
+            'group/sidebar-wrapper has-data-[variant=inset]:bg-background flex w-full h-full',
             className,
           )}
           {...props}

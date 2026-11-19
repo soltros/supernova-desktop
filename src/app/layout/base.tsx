@@ -29,7 +29,9 @@ export default function BaseLayout() {
 
   return (
     <div className="h-dvh w-full overflow-hidden">
-      <MainSidebarProvider className={mobile ? 'pt-0 pb-0' : undefined}>
+      <MainSidebarProvider
+        className={mobile ? undefined : 'pt-header pb-player'}
+      >
         {mobile ? (
           <MobileLayout />
         ) : (
